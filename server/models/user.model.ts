@@ -1,4 +1,4 @@
-import { Schema, model, Document } from "mongoose";
+import { Schema, model, HydratedDocument } from "mongoose";
 import bcrypt from "bcryptjs";
 
 /* =======================
@@ -9,7 +9,7 @@ const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 /* =======================
    User Interface
 ======================= */
-export interface IUser extends Document {
+export interface IUser {
   name: string;
   email: string;
   password: string;
@@ -19,13 +19,22 @@ export interface IUser extends Document {
   };
   role: "user" | "admin";
   isVerified: boolean;
+  courses: {
+    courseId: string;
+  }[];
+}
+
+/* =======================
+   Methods Interface
+======================= */
+interface IUserMethods {
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
 /* =======================
    User Schema
 ======================= */
-const userSchema = new Schema<IUser>(
+const userSchema = new Schema<IUser, {}, IUserMethods>(
   {
     name: {
       type: String,
@@ -71,16 +80,22 @@ const userSchema = new Schema<IUser>(
       type: Boolean,
       default: false,
     },
+
+    courses: [
+      {
+        courseId: {
+          type: String,
+        },
+      },
+    ],
   },
-  {
-    timestamps: true, // createdAt & updatedAt
-  }
+  { timestamps: true }
 );
 
 /* =======================
-   Hash Password (Modern)
+   Hash Password
 ======================= */
-userSchema.pre("save", async function () {
+userSchema.pre("save", async function (this: HydratedDocument<IUser>) {
   if (!this.isModified("password")) return;
 
   this.password = await bcrypt.hash(this.password, 12);

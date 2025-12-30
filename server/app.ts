@@ -25,7 +25,7 @@ app.use(
 app.get("/", (_req, res) => {
   res.status(200).json({
     success: true,
-    message: "🚀 LMS Backend is running",
+    message: " LMS Backend is running",
   });
 });
 

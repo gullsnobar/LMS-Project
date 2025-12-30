@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Account Activation</title>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f4f6f8;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    .email-wrapper {
+      width: 100%;
+      padding: 40px 0;
+    }
+
+    .email-container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    .email-header {
+      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      padding: 25px;
+      text-align: center;
+      color: #ffffff;
+    }
+
+    .email-header h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 600;
+    }
+
+    .email-body {
+      padding: 35px 30px;
+      color: #374151;
+    }
+
+    .email-body h2 {
+      font-size: 20px;
+      margin-bottom: 10px;
+      color: #111827;
+    }
+
+    .email-body p {
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .activation-code {
+      background-color: #f3f4f6;
+      border: 2px dashed #4f46e5;
+      padding: 15px;
+      text-align: center;
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 6px;
+      color: #4f46e5;
+      border-radius: 8px;
+      margin: 25px 0;
+    }
+
+    .note {
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .email-footer {
+      background-color: #f9fafb;
+      padding: 20px;
+      text-align: center;
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    .email-footer a {
+      color: #4f46e5;
+      text-decoration: none;
+    }
+
+    @media (max-width: 600px) {
+      .email-body {
+        padding: 25px 20px;
+      }
+
+      .activation-code {
+        font-size: 22px;
+        letter-spacing: 4px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="email-wrapper">
+    <div class="email-container">
+      
+      <!-- Header -->
+      <div class="email-header">
+        <h1>🎓 LMS Account Activation</h1>
+      </div>
+
+      <!-- Body -->
+      <div class="email-body">
+        <h2>Hello <%= name %>,</h2>
+
+        <p>
+          Welcome to our Learning Management System!  
+          Please use the activation code below to verify your account and start your learning journey.
+        </p>
+
+        <div class="activation-code">
+          <%= activationCode %>
+        </div>
+
+        <p class="note">
+           This activation code is valid for <strong>15 minutes</strong>.  
+          If you didn’t request this email, you can safely ignore it.
+        </p>
+
+        <p>
+          Happy learning!   
+          <br />
+          <strong>LMS Team</strong>
+        </p>
+      </div>
+
+      <!-- Footer -->
+      <div class="email-footer">
+        © <%= new Date().getFullYear() %> LMS Platform. All rights reserved.
+        <br />
+        <a href="#">Privacy Policy</a> • <a href="#">Support</a>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
