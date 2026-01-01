@@ -44,7 +44,7 @@ const errorMiddleware = (
     /**
      * ==========
      * JWT ERRORS
-     * ==========
+     * ==========`
      */
 
     // Invalid JWT

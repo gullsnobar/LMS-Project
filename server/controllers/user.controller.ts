@@ -4,20 +4,10 @@ import userModel from "../models/user.model";
 import ErrorHandler from "../utils/ErrorHandler";
 import { catchAsyncErrors } from "../middleware/catchAsyncErrors";
 import jwt from "jsonwebtoken";
-import ejs from "ejs";
-import path from "path";
-
-//  Correct template path
-const templatePath = path.join(
-  __dirname,
-  "..",
-  "views",
-  "emails",
-  "activationEmail.ejs"
-);
+import sendMail from "../utils/sendMail";
 
 // ===============================
-// Register User
+// Register User Interface
 // ===============================
 interface IRegistrationBody {
   name: string;
@@ -26,11 +16,17 @@ interface IRegistrationBody {
   avatar?: string;
 }
 
+// ===============================
+// Activation Token Interface
+// ===============================
 interface IActivationToken {
   token: string;
   activationCode: string;
 }
 
+// ===============================
+// Register User
+// ===============================
 export const registerationUser = catchAsyncErrors(
   async (req: Request, res: Response, next: NextFunction) => {
     const { name, email, password } = req.body;
@@ -53,16 +49,19 @@ export const registerationUser = catchAsyncErrors(
     const activationToken = createActivasionToken(user);
     const { activationCode } = activationToken;
 
-    //  FIXED: correct renderFile usage
-    const html = await ejs.renderFile(templatePath, {
-      name: user.name,
-      activationCode,
+    await sendMail({
+      email: user.email,
+      subject: "Activate your account",
+      template: "activationEmail.ejs",
+      data: {
+        name: user.name,
+        activationCode,
+      },
     });
-
-    // (email sending logic would use `html`)
 
     res.status(201).json({
       success: true,
+      message: "Activation email sent successfully",
       activationToken,
     });
   }
@@ -84,5 +83,61 @@ export const createActivasionToken = (
     }
   );
 
-  return { token, activationCode };
+  return {
+    token,
+    activationCode,
+  };
 };
+
+// ===============================
+// Activate User Interface
+// ===============================
+interface IActivationRequest {
+  activation_token: string;
+  activation_code: string;
+}
+
+// ===============================
+// Activate User
+// ===============================
+export const activateUser = catchAsyncErrors(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { activation_token, activation_code }: IActivationRequest = req.body;
+
+      const newUser = jwt.verify(
+        activation_token,
+        process.env.ACTIVATION_TOKEN_SECRET as string
+      ) as IRegistrationBody & { activationCode: string };
+
+      if (newUser.activationCode !== activation_code) {
+        return next(new ErrorHandler("Invalid activation code", 400));
+      }
+
+      const { name, email, password, avatar } = newUser;
+
+      const existingUser = await userModel.findOne({ email });
+      if (existingUser) {
+        return next(new ErrorHandler("User already exists", 400));
+      }
+
+      const user = new userModel({
+        name,
+        email,
+        password,
+        avatar,
+      });
+
+      await user.save();
+
+      res.status(201).json({
+        success: true,
+        message: "User activated successfully",
+      });
+    } catch (error) {
+      return next(
+        new ErrorHandler("Invalid or expired activation token", 400)
+      );
+    }
+  }
+);

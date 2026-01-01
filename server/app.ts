@@ -1,7 +1,8 @@
 import express, { Application } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import ErrorMiddleware from "./middleware/errorMiddleware"
+import ErrorMiddleware from "./middleware/errorMiddleware";
+import userRouter from "./routes/user.routes";
 
 const app: Application = express();
 
@@ -30,16 +31,13 @@ app.get("/", (_req, res) => {
 });
 
 /* =======================
-   Routes (example)
+   Routes
 ======================= */
-// app.use("/api/auth", authRoutes);
-// app.use("/api/users", userRoutes);
-// app.use("/api/courses", courseRoutes);
+app.use("/api/users", userRouter);
 
 /* =======================
    Global Error Handler
 ======================= */
-
 app.use((err: any, _req: any, res: any, _next: any) => {
   console.error(" Error:", err);
 
@@ -52,4 +50,3 @@ app.use((err: any, _req: any, res: any, _next: any) => {
 app.use(ErrorMiddleware);
 
 export { app };
-
