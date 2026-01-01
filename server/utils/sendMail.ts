@@ -11,9 +11,9 @@ interface EmailOptions {
 
 const sendMail = async (options: EmailOptions): Promise<void> => {
   try {
-    // ===============================
+    
     // Create Transporter
-    // ===============================
+  
     const transporter: Transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: Number(process.env.SMTP_PORT),
