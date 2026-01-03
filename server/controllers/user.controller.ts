@@ -141,3 +141,40 @@ export const activateUser = catchAsyncErrors(
     }
   }
 );
+
+// ===============================
+// Login User Interface
+// ===============================
+interface ILoginBody {
+  email: string;
+  password: string;
+}
+
+// ===============================
+// Login User
+// ===============================
+export const loginUser = catchAsyncErrors(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { email, password }: ILoginBody = req.body;
+
+    if (!email || !password) {
+      return next(new ErrorHandler("Email and password are required", 400));
+    }
+
+    const user = await userModel.findOne({ email }).select("+password");
+    if (!user) {
+      return next(new ErrorHandler("Invalid email or password", 401));
+    }
+
+    const isPasswordMatched = await user.comparePassword(password);
+    if (!isPasswordMatched) {
+      return next(new ErrorHandler("Invalid email or password", 401));
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      user,
+    });
+  }
+);

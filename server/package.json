@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only server.ts",
+    "dev": "ts-node-dev --respawn --transpile-only --ignore-watch node_modules --ignore-watch dist --ignore-watch .git server.ts",
     "start": "node server.ts"
   },
   "type": "commonjs",
@@ -36,6 +36,7 @@
     "@types/nodemailer": "^7.0.4",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }
 }

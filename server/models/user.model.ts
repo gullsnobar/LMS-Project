@@ -1,5 +1,7 @@
-import { Schema, model, HydratedDocument } from "mongoose";
+import { Schema, model, HydratedDocument, Model } from "mongoose";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import "dotenv/config";
 
 /* =======================
    Email Regex
@@ -27,14 +29,21 @@ export interface IUser {
 /* =======================
    Methods Interface
 ======================= */
-interface IUserMethods {
+export interface IUserMethods {
   comparePassword(candidatePassword: string): Promise<boolean>;
+  SignAccessToken(): string;
+  SignRefreshToken(): string;
 }
+
+/* =======================
+   Model Interface
+======================= */
+interface UserModel extends Model<IUser, {}, IUserMethods> {}
 
 /* =======================
    User Schema
 ======================= */
-const userSchema = new Schema<IUser, {}, IUserMethods>(
+const userSchema = new Schema<IUser, UserModel, IUserMethods>(
   {
     name: {
       type: String,
@@ -93,16 +102,7 @@ const userSchema = new Schema<IUser, {}, IUserMethods>(
 );
 
 /* =======================
-   Hash Password
-======================= */
-userSchema.pre("save", async function (this: HydratedDocument<IUser>) {
-  if (!this.isModified("password")) return;
-
-  this.password = await bcrypt.hash(this.password, 12);
-});
-
-/* =======================
-   Compare Password
+   Schema Methods
 ======================= */
 userSchema.methods.comparePassword = async function (
   candidatePassword: string
@@ -110,9 +110,35 @@ userSchema.methods.comparePassword = async function (
   return bcrypt.compare(candidatePassword, this.password);
 };
 
+userSchema.methods.SignAccessToken = function (): string {
+  return jwt.sign(
+    { id: this._id },
+    process.env.ACCESS_TOKEN as string,
+    { expiresIn: "15m" }
+  );
+};
+
+userSchema.methods.SignRefreshToken = function (): string {
+  return jwt.sign(
+    { id: this._id },
+    process.env.REFRESH_TOKEN as string,
+    { expiresIn: "7d" }
+  );
+};
+
+/* =======================
+   Hash Password
+======================= */
+userSchema.pre("save", async function (
+  this: HydratedDocument<IUser, IUserMethods>
+) {
+  if (!this.isModified("password")) return;
+  this.password = await bcrypt.hash(this.password, 12);
+});
+
 /* =======================
    User Model
 ======================= */
-const User = model<IUser>("User", userSchema);
+const User = model<IUser, UserModel>("User", userSchema);
 
 export default User;
