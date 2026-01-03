@@ -6,9 +6,6 @@ import userRouter from "./routes/user.routes";
 
 const app: Application = express();
 
-/* =======================
-   Middlewares
-======================= */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
