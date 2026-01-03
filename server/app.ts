@@ -32,9 +32,7 @@ app.get("/", (_req, res) => {
 ======================= */
 app.use("/api/users", userRouter);
 
-/* =======================
-   Global Error Handler
-======================= */
+
 app.use((err: any, _req: any, res: any, _next: any) => {
   console.error(" Error:", err);
 
