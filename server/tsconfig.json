@@ -8,7 +8,8 @@
     "esModuleInterop": true,
     "strict": true,
     "skipLibCheck": true,
-    "sourceMap": false
-
+    "sourceMap": false,
+    "types": ["node", "express", "jsonwebtoken"],
+    "forceConsistentCasingInFileNames": true
   }
 }

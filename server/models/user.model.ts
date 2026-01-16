@@ -1,4 +1,4 @@
-import { Schema, model, HydratedDocument, Model } from "mongoose";
+import { Schema, model, HydratedDocument, Model, Document } from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
@@ -11,7 +11,7 @@ const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 /* =======================
    User Interface
 ======================= */
-export interface IUser {
+export interface IUser extends Document, IUserMethods {
   name: string;
   email: string;
   password: string;

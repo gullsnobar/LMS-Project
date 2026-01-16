@@ -7,7 +7,7 @@ if (!process.env.REDIS_URL) {
     throw new Error('REDIS_URL is not defined in environment variables');
 }
 
-export const redis = new Redis(process.env.REDIS_URL);
+const redis = new Redis(process.env.REDIS_URL);
 
 redis.on('connect', () => {
     console.log('Redis is connected');
@@ -16,3 +16,6 @@ redis.on('connect', () => {
 redis.on('error', (err) => {
     console.error('Redis connection error:', err);
 });
+
+// Export redis instance as a named export
+export { redis };
