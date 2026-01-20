@@ -7,7 +7,7 @@ import { catchAsyncErrors } from "../middleware/catchAsyncErrors";
 import sendMail from "../utils/sendMail";
 import { sendToken } from "../utils/jwt";
 import { redis } from "../utils/redis";
-import { get } from "http";
+import cloudinary from "../utils/cloudinary";
 
 // ===============================
 // Register User Interface
@@ -402,3 +402,62 @@ export const updatePassword = catchAsyncErrors(async (req: Request, res: Respons
     return next(new ErrorHandler(message, 400));
   }
 });
+
+
+// update profile picture
+
+interface IUpdateProfilePicture {
+  avatar: string;
+}
+
+export const updateProfilePicture = catchAsyncErrors(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { avatar } = req.body as IUpdateProfilePicture;
+
+      if (!avatar) {
+        return next(new ErrorHandler("Avatar is required", 400));
+      }
+
+      const userId = req.user?._id;
+      if (!userId) {
+        return next(new ErrorHandler("Unauthorized", 401));
+      }
+
+      const user = await userModel.findById(userId);
+      if (!user) {
+        return next(new ErrorHandler("User not found", 404));
+      }
+
+      // Delete old avatar if exists
+      if (user.avatar?.public_id) {
+        await cloudinary.uploader.destroy(user.avatar.public_id);
+      }
+
+      // Upload new avatar
+      const myCloud = await cloudinary.uploader.upload(avatar, {
+        folder: "avatars",
+        width: 150,
+        crop: "scale",
+      });
+
+      user.avatar = {
+        public_id: myCloud.public_id,
+        url: myCloud.secure_url,
+      };
+
+      await user.save();
+
+      res.status(200).json({
+        success: true,
+        message: "Profile picture updated successfully",
+        avatar: user.avatar,
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        return next(new ErrorHandler(error.message, 400));
+      }
+      return next(new ErrorHandler("Something went wrong", 500));
+    }
+  }
+);
