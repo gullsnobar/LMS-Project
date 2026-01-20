@@ -63,7 +63,6 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>(
 
     password: {
       type: String,
-      required: [true, "Please enter your password"],
       minlength: [8, "Password should be at least 8 characters"],
       select: false,
     },

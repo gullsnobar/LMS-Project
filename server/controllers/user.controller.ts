@@ -7,6 +7,7 @@ import { catchAsyncErrors } from "../middleware/catchAsyncErrors";
 import sendMail from "../utils/sendMail";
 import { sendToken } from "../utils/jwt";
 import { redis } from "../utils/redis";
+import { get } from "http";
 
 // ===============================
 // Register User Interface
@@ -238,13 +239,91 @@ export const updateAccessToken = catchAsyncErrors(
         { expiresIn: "15m" }
       );
 
+
+      // Define token options (should match those in utils/jwt.ts)
+      const accessTokenExpire =
+        parseInt(process.env.ACCESS_TOKEN_EXPIRE || "15", 10) * 60 * 1000; // 15 minutes
+      const refreshTokenExpire =
+        parseInt(process.env.REFRESH_TOKEN_EXPIRE || "7", 10) * 24 * 60 * 60 * 1000; // 7 days
+
+      const accessTokenOptions: import('express').CookieOptions = {
+        expires: new Date(Date.now() + accessTokenExpire),
+        maxAge: accessTokenExpire,
+        httpOnly: true,
+        sameSite: 'lax' as 'lax',
+        secure: process.env.NODE_ENV === "production",
+      };
+
+      const refreshTokenOptions: import('express').CookieOptions = {
+        expires: new Date(Date.now() + refreshTokenExpire),
+        maxAge: refreshTokenExpire,
+        httpOnly: true,
+        sameSite: 'lax' as 'lax',
+        secure: process.env.NODE_ENV === "production",
+      };
+
+      // Set cookies with correct names and options
+      res.cookie("accessToken", accessToken, accessTokenOptions);
+      res.cookie("refreshToken", refresh_token, refreshTokenOptions);
+
       res.status(200).json({
         success: true,
-        message: "New access token generated",
+        message: "Tokens refreshed successfully",
         accessToken,
       });
+
     } catch (error) {
       return next(new ErrorHandler("Invalid refresh token. Please login again", 401));
+    }
+  }
+);
+
+// get user Info
+
+export const getUserInfo = catchAsyncErrors(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user?._id;
+      // getUserById(userId, res); // Function not defined, placeholder response below
+      res.status(200).json({ success: true, message: "User info endpoint placeholder", userId });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      return next(new ErrorHandler(message, 400));
+    }
+  }
+);
+
+interface ISocialAuthBody{
+  email: string;
+  name: string;
+  avatar: string;
+}
+
+
+// social auth
+
+export const socialAuth = catchAsyncErrors(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const {email, name, avatar} = req.body;
+      const user = await userModel.findOne({email});
+      if(!user){
+        const newUser = new userModel({
+          name,
+          email,
+          password: email + process.env.JWT_SECRET,
+          avatar,
+        });
+        await newUser.save();
+        sendToken(newUser, 200, res);
+      }
+      else{
+        sendToken(user, 200, res);
+      }
+    }
+     catch (error) {
+       const message = error instanceof Error ? error.message : String(error);
+       return next(new ErrorHandler(message, 400));
     }
   }
 );
