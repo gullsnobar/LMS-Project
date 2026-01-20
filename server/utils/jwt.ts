@@ -35,7 +35,7 @@ export const sendToken = (
 
 
   const accessTokenExpire =
-    parseInt(process.env.ACCESS_TOKEN_EXPIRE || "15", 10) *
+    parseInt(process.env.ACCESS_TOKEN_EXPIRE || "15", 10) * 60
     60 *
     1000; // 15 minutes
 

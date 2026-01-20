@@ -327,3 +327,78 @@ export const socialAuth = catchAsyncErrors(
     }
   }
 );
+
+// update user Info
+
+interface IUpdateUserInfo {
+name?: string;
+email?: string;
+}
+
+export const updateUserInfo = catchAsyncErrors(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { name, email } = req.body as IUpdateUserInfo;
+    const userId = req.user?._id;
+    const user = await userModel.findById(userId);
+    if (email && user) {
+      const isEmailExist = await userModel.findOne({ email });
+      if (isEmailExist) {
+        return next(new ErrorHandler("Email already in use", 400));
+      }
+      user.email = email;
+    }
+
+    if (name && user) {
+      user.name = name;
+    }
+    await user?.save();
+    // Set user in Redis with expiry (ioredis syntax: EX is a positional argument, not an object property)
+    await redis.set(userId, JSON.stringify(user), 'EX', 7 * 24 * 60 * 60);
+    res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return next(new ErrorHandler(message, 400));
+  }
+});
+
+
+// update user password
+
+interface IUpdatePassword {
+  oldPassword: string;
+  newPassword: string;
+}
+
+export const updatePassword = catchAsyncErrors(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { oldPassword, newPassword } = req.body as IUpdatePassword;
+    const userId = req.user?._id;
+    const user = await userModel.findById(userId).select("+password");
+
+    const isPasswordMatched = await user?.comparePassword(oldPassword);
+    if (!isPasswordMatched) {
+      return next(new ErrorHandler("Old password is incorrect", 400));
+    }
+
+    if(user?.password === undefined){
+      return next(new ErrorHandler("Password not set for this user", 400));
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    // Update the cached user in Redis
+    await redis.set(userId, JSON.stringify(user), 'EX', 7 * 24 * 60 * 60);
+
+    res.status(200).json({
+      success: true,
+      message: "Password updated successfully",
+    });
+  } catch (error: any){
+    const message = error instanceof Error ? error.message : String(error);
+    return next(new ErrorHandler(message, 400));
+  }
+});
