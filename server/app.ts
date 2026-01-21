@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import ErrorMiddleware from "./middleware/errorMiddleware";
 import userRouter from "./routes/user.routes";
+import courseRouter from "./routes/course.route";
 
 const app: Application = express();
 
@@ -31,6 +32,7 @@ app.get("/", (_req, res) => {
    Routes
 ======================= */
 app.use("/api/users", userRouter);
+app.use("/api/courses", courseRouter);
 
 
 app.use((err: any, _req: any, res: any, _next: any) => {
