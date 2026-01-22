@@ -47,7 +47,7 @@ export interface ICourse extends Document {
   level: "Beginner" | "Intermediate" | "Advanced";
   demoUrl?: string;
   benefits: string[];
-  courseData: ICourseData;
+  courseData: ICourseData[];
   prerequisites?: string[];
   reviews: IReview[];
   ratings: number;
@@ -124,7 +124,7 @@ const courseSchema = new Schema<ICourse>(
 
     benefits: [{ type: String, required: true }],
 
-    courseData: { type: courseDataSchema, required: true },
+    courseData: [{ type: courseDataSchema, required: true }],
 
     prerequisites: [{ type: String }],
 

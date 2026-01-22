@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only --ignore-watch node_modules --ignore-watch dist --ignore-watch .git server.ts",
+    "dev": "ts-node-dev --respawn --clear server.ts",
     "start": "node server.ts"
   },
   "type": "commonjs",
