@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import ErrorMiddleware from "./middleware/errorMiddleware";
 import userRouter from "./routes/user.routes";
 import courseRouter from "./routes/course.route";
+import orderRouter from "./routes/order.route";
 
 const app: Application = express();
 
@@ -33,12 +34,13 @@ app.get("/", (_req: Request, res: Response) => {
 ======================= */
 app.use("/api/users", userRouter);
 app.use("/api/courses", courseRouter);
+app.use("/api/orders", orderRouter);
 
 /* =======================
    Error Handling Middleware
 ======================= */
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-  console.error("🔥 Error:", err);
+  console.error("Error:", err);
   res.status(err.status || 500).json({
     success: false,
     message: err.message || "Internal Server Error",

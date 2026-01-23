@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order Confirmation</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6f8;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        .email-wrapper {
+            width: 100%;
+            padding: 40px 0;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .email-header {
+            background: linear-gradient(135deg, #10b981, #059669);
+            padding: 25px;
+            text-align: center;
+            color: #ffffff;
+        }
+
+        .email-header h1 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .email-body {
+            padding: 35px 30px;
+            color: #374151;
+        }
+
+        .email-body h2 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #111827;
+        }
+
+        .email-body p {
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .success-icon {
+            text-align: center;
+            font-size: 48px;
+            margin: 20px 0;
+        }
+
+        .order-details {
+            background-color: #f9fafb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+
+        .order-details h3 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            color: #111827;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+
+        .order-item .label {
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .order-item .value {
+            color: #111827;
+            font-weight: 600;
+        }
+
+        .price-highlight {
+            background-color: #ecfdf5;
+            border: 2px solid #10b981;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .price-highlight .label {
+            font-size: 13px;
+            color: #059669;
+            margin-bottom: 5px;
+        }
+
+        .price-highlight .amount {
+            font-size: 32px;
+            font-weight: 700;
+            color: #10b981;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 14px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .note {
+            font-size: 13px;
+            color: #6b7280;
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 12px 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+
+        .email-footer {
+            background-color: #f9fafb;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        .email-footer a {
+            color: #4f46e5;
+            text-decoration: none;
+        }
+
+        @media (max-width: 600px) {
+            .email-body {
+                padding: 25px 20px;
+            }
+
+            .order-item {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .price-highlight .amount {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="email-wrapper">
+        <div class="email-container">
+
+            <!-- Header -->
+            <div class="email-header">
+                <h1>✅ Order Confirmation</h1>
+            </div>
+
+            <!-- Body -->
+            <div class="email-body">
+                <div class="success-icon">🎉</div>
+
+                <h2>Thank you for your purchase!</h2>
+
+                <p>
+                    Your enrollment has been successfully confirmed. You now have full access to the course materials
+                    and can start learning right away!
+                </p>
+
+                <!-- Order Details -->
+                <div class="order-details">
+                    <h3>📋 Order Details</h3>
+
+                    <div class="order-item">
+                        <span class="label">Order ID:</span>
+                        <span class="value">#<%= order.order._id %></span>
+                    </div>
+
+                    <div class="order-item">
+                        <span class="label">Course Name:</span>
+                        <span class="value">
+                            <%= order.order.name %>
+                        </span>
+                    </div>
+
+                    <div class="order-item">
+                        <span class="label">Purchase Date:</span>
+                        <span class="value">
+                            <%= order.order.date %>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Price -->
+                <div class="price-highlight">
+                    <div class="label">Total Amount Paid</div>
+                    <div class="amount">$<%= order.order.price %>
+                    </div>
+                </div>
+
+                <p style="text-align: center;">
+                    <a href="#" class="cta-button">Start Learning Now →</a>
+                </p>
+
+                <div class="note">
+                    <strong>💡 What's Next?</strong><br>
+                    You can access your course from your dashboard. All course materials, videos, and resources are now
+                    available to you. Check your profile to see all your enrolled courses.
+                </div>
+
+                <p>
+                    If you have any questions about your purchase or need assistance, feel free to reach out to our
+                    support team.
+                </p>
+
+                <p>
+                    Happy learning! 🚀
+                    <br />
+                    <strong>LMS Team</strong>
+                </p>
+            </div>
+
+            <!-- Footer -->
+            <div class="email-footer">
+                © <%= new Date().getFullYear() %> LMS Platform. All rights reserved.
+                    <br />
+                    <a href="#">Privacy Policy</a> • <a href="#">Support</a> • <a href="#">Contact Us</a>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+</html>
