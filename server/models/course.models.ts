@@ -52,6 +52,8 @@ export interface ICourse extends Document {
   reviews: IReview[];
   ratings: number;
   purchased: number;
+  numOfReviews: number;
+  instructor: object;
 }
 
 /* -------------------- Schemas -------------------- */
@@ -133,6 +135,10 @@ const courseSchema = new Schema<ICourse>(
     ratings: { type: Number, default: 0 },
 
     purchased: { type: Number, default: 0 },
+
+    numOfReviews: { type: Number, default: 0 },
+
+    instructor: { type: Object, required: true },
   },
   { timestamps: true }
 );

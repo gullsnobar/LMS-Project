@@ -1,4 +1,4 @@
-import express, { Application } from "express";
+import express, { Application, Request, Response, NextFunction } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import ErrorMiddleware from "./middleware/errorMiddleware";
@@ -21,23 +21,24 @@ app.use(
 /* =======================
    Health Check Route
 ======================= */
-app.get("/", (_req, res) => {
+app.get("/", (_req: Request, res: Response) => {
   res.status(200).json({
     success: true,
-    message: " LMS Backend is running",
+    message: "LMS Backend is running",
   });
 });
 
 /* =======================
-   Routes
+   API Routes
 ======================= */
 app.use("/api/users", userRouter);
 app.use("/api/courses", courseRouter);
 
-
-app.use((err: any, _req: any, res: any, _next: any) => {
-  console.error(" Error:", err);
-
+/* =======================
+   Error Handling Middleware
+======================= */
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  console.error("🔥 Error:", err);
   res.status(err.status || 500).json({
     success: false,
     message: err.message || "Internal Server Error",
