@@ -81,6 +81,9 @@ export const createOrder = catchAsyncErrors(
                     data: mailData,
                 });
             }
+
+            course.purchased ? course.purchased += 1 : course.purchased = 1;
+            await course.save();
         } catch (error: any) {
             console.error("Failed to send order confirmation email:", error);
         }

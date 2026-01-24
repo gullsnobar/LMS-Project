@@ -5,6 +5,7 @@ import ErrorMiddleware from "./middleware/errorMiddleware";
 import userRouter from "./routes/user.routes";
 import courseRouter from "./routes/course.route";
 import orderRouter from "./routes/order.route";
+import notificationRouter from "./routes/notification.route";
 
 const app: Application = express();
 
@@ -35,6 +36,7 @@ app.get("/", (_req: Request, res: Response) => {
 app.use("/api/users", userRouter);
 app.use("/api/courses", courseRouter);
 app.use("/api/orders", orderRouter);
+app.use("/api/notifications", notificationRouter);
 
 /* =======================
    Error Handling Middleware
