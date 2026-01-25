@@ -2,6 +2,7 @@ import "dotenv/config";
 import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import userModel from "../models/user.model";
+import courseModel from "../models/course.models";
 import ErrorHandler from "../utils/ErrorHandler";
 import { catchAsyncErrors } from "../middleware/catchAsyncErrors";
 import sendMail from "../utils/sendMail";
@@ -495,6 +496,55 @@ export const updateUserRole = catchAsyncErrors(
       res.status(200).json({
         success: true,
         message: "User role updated successfully",
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        return next(new ErrorHandler(error.message, 400));
+      }
+      return next(new ErrorHandler("Something went wrong", 500));
+    }
+  }
+);
+
+
+// delete user -- admin only
+
+export const deleteUser = catchAsyncErrors(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id } = req.body;
+      const user = await userModel.findById(id);
+      if (!user) {
+        return next(new ErrorHandler("User not found", 404));
+      }
+      await user.deleteOne();
+      res.status(200).json({
+        success: true,
+        message: "User deleted successfully",
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        return next(new ErrorHandler(error.message, 400));
+      }
+      return next(new ErrorHandler("Something went wrong", 500));
+    }
+  }
+);
+
+// delete course -- admin only
+
+export const deleteCourse = catchAsyncErrors(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id } = req.body;
+      const course = await courseModel.findById(id);
+      if (!course) {
+        return next(new ErrorHandler("Course not found", 404));
+      }
+      await course.deleteOne();
+      res.status(200).json({
+        success: true,
+        message: "Course deleted successfully",
       });
     } catch (error) {
       if (error instanceof Error) {
