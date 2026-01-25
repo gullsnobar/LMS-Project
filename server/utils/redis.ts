@@ -3,19 +3,17 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-if (!process.env.REDIS_URL) {
-    throw new Error('REDIS_URL is not defined in environment variables');
+const redis = process.env.REDIS_URL ? new Redis(process.env.REDIS_URL) : null as any;
+
+if (redis) {
+    redis.on('connect', () => {
+        console.log('✅ Redis connected');
+    });
+
+    redis.on('error', (err: any) => {
+        console.error('❌ Redis error:', err.message);
+    });
 }
-
-const redis = new Redis(process.env.REDIS_URL);
-
-redis.on('connect', () => {
-    console.log('Redis is connected');
-});
-
-redis.on('error', (err) => {
-    console.error('Redis connection error:', err);
-});
 
 // Export redis instance as a named export
 export { redis };

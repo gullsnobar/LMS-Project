@@ -10,34 +10,10 @@ import connectDB from "./utils/db";
 
 const PORT = Number(process.env.PORT) || 5000;
 
-// Debug: log loaded env variables
-console.log("PORT:", process.env.PORT);
-console.log("MONGO_URI:", process.env.MONGO_URI?.substring(0, 30) + "...");
-console.log("CLOUD_NAME:", process.env.CLOUD_NAME);
-
-["CLOUD_NAME", "CLOUD_API_KEY", "CLOUD_SECRET_KEY"].forEach((key) => {
-  if (!process.env[key]) {
-    console.warn(`Environment variable ${key} is missing`);
-  }
-});
-
 // Validate MongoDB connection string
 if (!process.env.MONGO_URI) {
   console.error("MONGO_URI is not defined in environment variables");
-  console.log("Please check your .env file");
   process.exit(1);
-}
-
-// Check if it's an SRV connection string and suggest alternatives
-const mongoUri = process.env.MONGO_URI;
-if (mongoUri.includes('mongodb+srv://')) {
-  console.log("ℹUsing SRV connection string for MongoDB Atlas");
-  
-  // You might want to try the non-SRV version if SRV fails
-  console.log("💡 If connection fails, try using non-SRV connection string from MongoDB Atlas:");
-  console.log("   - Go to Atlas → Connect → Connect your application");
-  console.log("   - Choose 'Node.js Driver 5.0 or later'");
-  console.log("   - Use the connection string WITHOUT 'mongodb+srv://' prefix");
 }
 
 cloudinary.config({
@@ -48,33 +24,25 @@ cloudinary.config({
 
 const startServer = async () => {
   try {
-    console.log("Connecting to database...");
-    await connectDB();
-    console.log("Database connected successfully");
-
-    if (!app || typeof app.listen !== "function") {
-      console.error(" app is not a valid Express instance");
-      process.exit(1);
+    // Try to connect to database
+    try {
+      await connectDB();
+      console.log("Database connected");
+    } catch (dbError) {
+      if (process.env.NODE_ENV === 'production') {
+        console.error("Database connection required in production");
+        process.exit(1);
+      }
+      // In development, continue without database
+      // console.log("Running without database connection");
     }
 
     app.listen(PORT, () => {
       console.log(`Server running on http://localhost:${PORT}`);
-      console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`Ready to accept requests!\n`);
     });
   } catch (error) {
-    console.error(" Server startup failed:", error);
-    
-    // Provide specific guidance for MongoDB connection errors
-    if (error instanceof Error && error.message.includes('MongoDB')) {
-      console.log("\n MongoDB Connection Troubleshooting:");
-      console.log("1. Check your internet connection");
-      console.log("2. Verify your IP is whitelisted in MongoDB Atlas");
-      console.log("3. Try using Google DNS (8.8.8.8 and 8.8.4.4)");
-      console.log("4. If using SRV string, try non-SRV connection string");
-      console.log("5. Check if MongoDB Atlas cluster is running");
-    }
-    
-    // Exit with error code
+    console.error("Server startup failed:", error);
     process.exit(1);
   }
 };
