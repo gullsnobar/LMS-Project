@@ -5,7 +5,8 @@ import OrderModel from "../models/orderModel";
 import userModel from "../models/user.model";
 import CourseModel from "../models/course.models";
 import NotificationModel from "../models/notificationModel";
-import { newOrder } from "../services/order.service";
+import { getAllOrdersService, newOrder } from "../services/order.service";
+import { getAllUsersService } from "../services/user.service";
 import ejs from "ejs";
 import path from "path";
 import sendMail from "../utils/sendMail";
@@ -104,5 +105,21 @@ export const createOrder = catchAsyncErrors(
             success: true,
             order: course,
         });
+    }
+);
+
+// get all orders
+
+
+export const getAllOrdersServices = catchAsyncErrors(
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            await getAllOrdersService(res);
+        } catch (error) {
+            if (error instanceof Error) {
+                return next(new ErrorHandler(error.message, 400));
+            }
+            return next(new ErrorHandler("Something went wrong", 500));
+        }
     }
 );

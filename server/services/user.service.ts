@@ -19,3 +19,13 @@ export const getUserById = async (id: string, res: Response
         user,
     });
 }
+
+// Get All users
+
+export const getAllUsersService = async (res: Response) => {
+  const users = await userModel.find();
+  res.status(201).json({
+    success: true,
+    users,
+  });
+}

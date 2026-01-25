@@ -8,7 +8,6 @@ import CourseModel from "../models/course.models";
 import mongoose from "mongoose";
 import ejs from "ejs";
 import path from "path";
-import { nextTick } from "process";
 
 // upload Course
 export const uploadCourse = catchAsyncErrors(
@@ -441,3 +440,22 @@ export const addReplyToReview = catchAsyncErrors(async (req: Request, res: Respo
     return next(new ErrorHandler(error.message, 500));
   }
 })
+
+// get all courses -- admin
+
+export const getAllCoursesAdmin = catchAsyncErrors(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const courses = await CourseModel.find();
+      res.status(201).json({
+        success: true,
+        courses,
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        return next(new ErrorHandler(error.message, 400));
+      }
+      return next(new ErrorHandler("Something went wrong", 500));
+    }
+  }
+);

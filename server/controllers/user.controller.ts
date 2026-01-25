@@ -8,6 +8,7 @@ import sendMail from "../utils/sendMail";
 import { sendToken } from "../utils/jwt";
 import { redis } from "../utils/redis";
 import cloudinary from "../utils/cloudinary";
+import { getAllUsersService } from "../services/user.service";
 
 // ===============================
 // Register User Interface
@@ -293,7 +294,7 @@ export const getUserInfo = catchAsyncErrors(
   }
 );
 
-interface ISocialAuthBody{
+interface ISocialAuthBody {
   email: string;
   name: string;
   avatar: string;
@@ -305,9 +306,9 @@ interface ISocialAuthBody{
 export const socialAuth = catchAsyncErrors(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const {email, name, avatar} = req.body;
-      const user = await userModel.findOne({email});
-      if(!user){
+      const { email, name, avatar } = req.body;
+      const user = await userModel.findOne({ email });
+      if (!user) {
         const newUser = new userModel({
           name,
           email,
@@ -317,13 +318,13 @@ export const socialAuth = catchAsyncErrors(
         await newUser.save();
         sendToken(newUser, 200, res);
       }
-      else{
+      else {
         sendToken(user, 200, res);
       }
     }
-     catch (error) {
-       const message = error instanceof Error ? error.message : String(error);
-       return next(new ErrorHandler(message, 400));
+    catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      return next(new ErrorHandler(message, 400));
     }
   }
 );
@@ -331,8 +332,8 @@ export const socialAuth = catchAsyncErrors(
 // update user Info
 
 interface IUpdateUserInfo {
-name?: string;
-email?: string;
+  name?: string;
+  email?: string;
 }
 
 export const updateUserInfo = catchAsyncErrors(async (req: Request, res: Response, next: NextFunction) => {
@@ -383,7 +384,7 @@ export const updatePassword = catchAsyncErrors(async (req: Request, res: Respons
       return next(new ErrorHandler("Old password is incorrect", 400));
     }
 
-    if(user?.password === undefined){
+    if (user?.password === undefined) {
       return next(new ErrorHandler("Password not set for this user", 400));
     }
 
@@ -397,7 +398,7 @@ export const updatePassword = catchAsyncErrors(async (req: Request, res: Respons
       success: true,
       message: "Password updated successfully",
     });
-  } catch (error: any){
+  } catch (error: any) {
     const message = error instanceof Error ? error.message : String(error);
     return next(new ErrorHandler(message, 400));
   }
@@ -452,6 +453,48 @@ export const updateProfilePicture = catchAsyncErrors(
         success: true,
         message: "Profile picture updated successfully",
         avatar: user.avatar,
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        return next(new ErrorHandler(error.message, 400));
+      }
+      return next(new ErrorHandler("Something went wrong", 500));
+    }
+  }
+);
+
+
+// Get All users
+
+export const getAllUsers = catchAsyncErrors(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await getAllUsersService(res);
+    } catch (error) {
+      if (error instanceof Error) {
+        return next(new ErrorHandler(error.message, 400));
+      }
+      return next(new ErrorHandler("Something went wrong", 500));
+    }
+  }
+);
+
+
+// update user role  -- admin only
+
+export const updateUserRole = catchAsyncErrors(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id, role } = req.body;
+      const user = await userModel.findById(id);
+      if (!user) {
+        return next(new ErrorHandler("User not found", 404));
+      }
+      user.role = role;
+      await user.save();
+      res.status(200).json({
+        success: true,
+        message: "User role updated successfully",
       });
     } catch (error) {
       if (error instanceof Error) {

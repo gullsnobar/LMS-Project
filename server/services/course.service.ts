@@ -3,6 +3,7 @@ import { catchAsyncErrors } from "../middleware/catchAsyncErrors";
 import ErrorHandler from "../utils/ErrorHandler";
 import cloudinary from "cloudinary";
 import CourseModel from "../models/course.models";
+import userModel from "../models/user.model";
 
 export const uploadCourse = catchAsyncErrors(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -41,3 +42,12 @@ export const uploadCourse = catchAsyncErrors(
     });
   }
 );
+
+
+export const getAllCoursesService = async (res: Response) => {
+  const courses = await CourseModel.find();
+  res.status(201).json({
+    success: true,
+    courses,
+  });
+}

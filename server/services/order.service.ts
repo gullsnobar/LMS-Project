@@ -32,3 +32,13 @@ export const newOrder = async (
         throw new Error(`Order creation failed: ${error.message}`);
     }
 };
+
+// get all orders
+
+export const getAllOrdersService = async (res: Response) => {
+    const orders = await OrderModel.find();
+    res.status(201).json({
+        success: true,
+        orders,
+    });
+}
