@@ -1,20 +1,20 @@
 import { Document, model, Schema } from "mongoose";
 
-interface FaqItem extends Document{
+interface FaqItem {
     question: string;
     answer: string;
 }
-interface Category extends Document{
+interface Category {
     name: string;
     slug: string;
 }
 
-interface BannerImage extends Document{
+interface BannerImage {
     public_id: string;
     secure_url: string;
 }
 
-interface Layout extends Document{
+interface Layout extends Document {
     type: string;
     faq: FaqItem[];
     category: Category[];
