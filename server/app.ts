@@ -6,6 +6,7 @@ import userRouter from "./routes/user.routes";
 import courseRouter from "./routes/course.route";
 import orderRouter from "./routes/order.route";
 import notificationRouter from "./routes/notification.route";
+import analyticsRouter from "./routes/analytics.route";
 
 const app: Application = express();
 
@@ -37,6 +38,7 @@ app.use("/api/users", userRouter);
 app.use("/api/courses", courseRouter);
 app.use("/api/orders", orderRouter);
 app.use("/api/notifications", notificationRouter);
+app.use("/api/analytics", analyticsRouter);
 
 /* =======================
    Error Handling Middleware
