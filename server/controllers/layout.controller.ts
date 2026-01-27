@@ -58,7 +58,8 @@ export const createLayout = CatchAsyncError(
                 await LayoutModel.create({ type: "FAQ", faq: faqItems });
             }
 
-            // ---------------- Categories ----------------
+            
+
             if (type === "Categories") {
                 const { categories } = req.body;
 
