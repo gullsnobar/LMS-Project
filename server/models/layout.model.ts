@@ -50,8 +50,8 @@ const layoutSchema = new Schema({
         image: [bannerImageSchema],
         title: { type: String, required: true },
         subTitle: { type: String, required: true },
-        button: { type: String, required: true },
-        link: { type: String, required: true },
+        button: { type: String },
+        link: { type: String },
     }
 });
 

@@ -40,6 +40,7 @@ app.use("/api/courses", courseRouter);
 app.use("/api/orders", orderRouter);
 app.use("/api/notifications", notificationRouter);
 app.use("/api/analytics", analyticsRouter);
+app.use("/api/layout", layoutRouter);
 
 /* =======================
    Error Handling Middleware

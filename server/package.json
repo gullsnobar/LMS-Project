@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "server.ts",
   "scripts": {
-    "dev": "tsx watch server.ts",
+    "dev": "ts-node-dev --respawn --transpile-only server.ts",
     "start": "node server.ts"
   },
   "type": "commonjs",
