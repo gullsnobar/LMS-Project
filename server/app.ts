@@ -22,6 +22,9 @@ app.use(
   })
 );
 
+console.log("Server file started"); 
+
+
 /* =======================
    Health Check Route
 ======================= */
