@@ -36,7 +36,7 @@ const Header: FC<Props> = ({ open, setOpen, activeItem, setRoute }) => {
                     {/* Logo */}
                     <Link
                         href="/"
-                        className="text-[25px] font-poppins font-[500] text-black dark:text-white"
+                        className="text-[27px] font-poppins font-[500] text-black dark:text-white"
                     >
                         ELearning
                     </Link>

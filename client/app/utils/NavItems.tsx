@@ -34,7 +34,7 @@ const NavItems: FC<Props> = ({ isMobile }) => {
           <Link
             key={index}
             href={item.url}
-            className={`text-[20px] font-poppins font-[500] transition duration-200 ${
+            className={`text-[18px] font-poppins font-[500] transition duration-200 ${
               isActive
                 ? "text-[#37a39a]"
                 : "text-black dark:text-white hover:text-[#37a39a]"
