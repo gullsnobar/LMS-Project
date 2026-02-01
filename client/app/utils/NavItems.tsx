@@ -8,7 +8,8 @@ export const navItemsData = [
   { name: "Home", url: "/" },
   { name: "Courses", url: "/courses" },
   { name: "About", url: "/about" },
-  { name: "Contact", url: "/contact" },
+  { name: "Policy", url: "/policy" },
+   { name: "FAQ", url: "/faq" },
 ];
 
 type Props = {
@@ -34,7 +35,7 @@ const NavItems: FC<Props> = ({ isMobile }) => {
           <Link
             key={index}
             href={item.url}
-            className={`text-[18px] font-poppins font-[500] transition duration-200 ${
+            className={`text-[16px] font-poppins font-[600] transition duration-200 ${
               isActive
                 ? "text-[#37a39a]"
                 : "text-black dark:text-white hover:text-[#37a39a]"

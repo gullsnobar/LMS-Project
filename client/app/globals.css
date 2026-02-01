@@ -1,23 +1,22 @@
 @import "tailwindcss";
 
+/* Enable class-based dark mode for Tailwind v4 */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --foreground-rgb: 0, 0, 0;
-  --background-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --background-rgb: 255, 255, 255;
 }
 
-
-@media (prefers-colors-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+html.dark {
+  --foreground-rgb: 255, 255, 255;
+  --background-rgb: 17, 24, 39;
 }
 
 body {
   color: rgb(var(--foreground-rgb));
   background-color: rgb(var(--background-rgb));
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .hero_animation {
@@ -28,24 +27,31 @@ body {
 
 @keyframes changeBackground {
 
-  0%, 100%{
+  0%,
+  100% {
     opacity: 1;
   }
+
   16.67% {
     opacity: 0.9;
   }
+
   33.34% {
     opacity: 0.8;
   }
+
   50% {
     opacity: 0.7;
   }
+
   66.67% {
     opacity: 0.6;
   }
+
   83.34% {
     opacity: 0.5;
   }
+
   100% {
     opacity: 0.4;
   }
