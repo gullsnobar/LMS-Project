@@ -4,6 +4,7 @@ import { ThemeProvider } from 'next-themes';
 import { Poppins } from "next/font/google";
 import { Josefin_Sans } from "next/font/google";
 import { ReduxProvider } from './utils/ReduxProvider';
+import { Toaster } from 'react-hot-toast';
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -33,6 +34,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <ReduxProvider>
             {children}
+            <Toaster position='top-center' reverseOrder={false}/>
           </ReduxProvider>
         </ThemeProvider>
       </body>

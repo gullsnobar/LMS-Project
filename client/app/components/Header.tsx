@@ -8,6 +8,7 @@ import { HiOutlineUserCircle } from "react-icons/hi";
 import CustomModal from "../utils/CustomModel";
 import Login from "./Auth/Login";
 import SignUp from "./Auth/SignUp";
+import Verification from "./Auth/Verification";
 
 const Header: FC = () => {
   const [scrolled, setScrolled] = useState(false);
