@@ -19,7 +19,7 @@ type VerifyNumber = {
 
 const Verification: FC<Props> = ({ setRoute, setOpen, isPage = false }) => {
     const [invalidError, setInvalidError] = useState(false);
-    const [activation, { isSuccess, error }] = useActivationMutation();
+    const [activation, { isSuccess, error, isLoading }] = useActivationMutation();
 
     const inputRefs = [
         useRef<HTMLInputElement>(null),
@@ -38,8 +38,11 @@ const Verification: FC<Props> = ({ setRoute, setOpen, isPage = false }) => {
     useEffect(() => {
         if (isSuccess) {
             toast.success("Account verified successfully!");
+            // Clear the activation token from localStorage
+            localStorage.removeItem("activation_token");
             if (isPage) {
                 // Handle page navigation if needed
+                window.location.href = "/login";
             } else {
                 setRoute("Login");
             }
@@ -146,8 +149,8 @@ const Verification: FC<Props> = ({ setRoute, setOpen, isPage = false }) => {
                             onChange={(e) => handleInputChange(index, e.target.value)}
                             onKeyDown={(e) => handleKeyDown(index, e)}
                             className={`w-14 h-14 text-center text-2xl font-bold rounded-xl border-2 ${invalidError
-                                    ? "border-red-500 focus:ring-red-500"
-                                    : "border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:ring-blue-500"
+                                ? "border-red-500 focus:ring-red-500"
+                                : "border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:ring-blue-500"
                                 } bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 transition-all duration-200`}
                         />
                     ))}
@@ -163,9 +166,9 @@ const Verification: FC<Props> = ({ setRoute, setOpen, isPage = false }) => {
             <button
                 onClick={verificationHandler}
                 className="w-full py-2.5 px-6 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                disabled={Object.values(verifyNumber).some((num) => num === "")}
+                disabled={Object.values(verifyNumber).some((num) => num === "") || isLoading}
             >
-                Verify Account
+                {isLoading ? "Verifying..." : "Verify Account"}
             </button>
 
             {/* Resend Code */}
