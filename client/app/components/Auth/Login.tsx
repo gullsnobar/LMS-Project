@@ -16,6 +16,7 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+
 type Props = {
     setRoute?: (route: "Login" | "Sign-Up" | "Verification") => void;
     setOpen?: (open: boolean) => void;
@@ -79,8 +80,8 @@ const Login: FC<Props> = ({ setRoute, setOpen, isPage = false }) => {
             <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Email Field */}
                 <div>
-                    <label 
-                        className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5" 
+                    <label
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5"
                         htmlFor="email"
                     >
                         Email Address
@@ -92,11 +93,10 @@ const Login: FC<Props> = ({ setRoute, setOpen, isPage = false }) => {
                         onChange={handleChange}
                         id="email"
                         placeholder="your.email@example.com"
-                        className={`w-full px-4 py-2.5 rounded-xl border ${
-                            errors.email && touched.email 
-                                ? "border-red-500 focus:ring-red-500" 
+                        className={`w-full px-4 py-2.5 rounded-xl border ${errors.email && touched.email
+                                ? "border-red-500 focus:ring-red-500"
                                 : "border-gray-300 dark:border-gray-600 focus:ring-blue-500"
-                        } bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-200`}
+                            } bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-200`}
                     />
                     {errors.email && touched.email && (
                         <span className="text-red-500 text-xs mt-1 block">{errors.email}</span>
@@ -105,8 +105,8 @@ const Login: FC<Props> = ({ setRoute, setOpen, isPage = false }) => {
 
                 {/* Password Field */}
                 <div>
-                    <label 
-                        className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5" 
+                    <label
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5"
                         htmlFor="password"
                     >
                         Password
@@ -119,11 +119,10 @@ const Login: FC<Props> = ({ setRoute, setOpen, isPage = false }) => {
                             onChange={handleChange}
                             id="password"
                             placeholder="Enter your password"
-                            className={`w-full px-4 py-2.5 pr-12 rounded-xl border ${
-                                errors.password && touched.password 
-                                    ? "border-red-500 focus:ring-red-500" 
+                            className={`w-full px-4 py-2.5 pr-12 rounded-xl border ${errors.password && touched.password
+                                    ? "border-red-500 focus:ring-red-500"
                                     : "border-gray-300 dark:border-gray-600 focus:ring-blue-500"
-                            } bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-200`}
+                                } bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 transition-all duration-200`}
                         />
                         {!show ? (
                             <AiOutlineEyeInvisible
@@ -145,8 +144,8 @@ const Login: FC<Props> = ({ setRoute, setOpen, isPage = false }) => {
                 </div>
 
                 {/* Submit Button */}
-                <button 
-                    type="submit" 
+                <button
+                    type="submit"
                     className="w-full py-2.5 px-6 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
                 >
                     Sign In
@@ -188,8 +187,8 @@ const Login: FC<Props> = ({ setRoute, setOpen, isPage = false }) => {
                 <p className="text-center text-xs text-gray-600 dark:text-gray-400 mt-4">
                     Don't have an account?{" "}
                     {isPage ? (
-                        <Link 
-                            href="/signup" 
+                        <Link
+                            href="/signup"
                             className="font-semibold text-blue-600 dark:text-blue-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
                         >
                             Create Account
@@ -213,7 +212,7 @@ const Login: FC<Props> = ({ setRoute, setOpen, isPage = false }) => {
                 {/* Background Decorations */}
                 <div className="absolute top-[100px] left-[50px] w-[300px] h-[300px] bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-20 blur-3xl" />
                 <div className="absolute bottom-[100px] right-[50px] w-[250px] h-[250px] bg-gradient-to-tr from-purple-400 to-pink-400 rounded-full opacity-20 blur-3xl" />
-                
+
                 {/* Login Card */}
                 <div className="w-full max-w-md relative z-10">
                     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 backdrop-blur-sm border border-gray-200 dark:border-gray-700">
