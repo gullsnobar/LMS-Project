@@ -14,20 +14,49 @@ import SignUp from "./Auth/SignUp";
 import Verification from "./Auth/Verification";
 import { useSelector } from "react-redux";
 import { useSession, signOut } from "next-auth/react";
+import { useSocialAuthMutation } from "../../redux/features/auth/authApi";
 
-const Header: FC = () => {
+type Props = {
+  open?: boolean;
+  setOpen?: (open: boolean) => void;
+  activeItem?: number;
+  setActiveItem?: (item: number) => void;
+  route?: string;
+  setRoute?: (route: string) => void;
+};
+
+const Header: FC<Props> = ({ activeItem: activeItemProp, setOpen: setOpenProp, route: routeProp, open: openProp, setRoute: setRouteProp }) => {
+  const [activeItemState, setActiveItemState] = useState(0);
   const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuOpenState, setMenuOpenState] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [profileDropdown, setProfileDropdown] = useState(false);
-  const [route, setRoute] = useState<"Login" | "Sign-Up" | "Verification">("Login");
-  const [activeItem, setActiveItem] = useState(0);
+  const [routeState, setRouteState] = useState<"Login" | "Sign-Up" | "Verification">("Login");
+
+  const activeItem = activeItemProp ?? activeItemState;
+  const route = routeProp ?? routeState;
+  const menuOpen = openProp ?? menuOpenState;
+
+  const setRoute = (r: string) => {
+    setRouteState(r as any);
+    if (setRouteProp) setRouteProp(r);
+  };
+
+  const setMenuOpen = (value: boolean | ((prev: boolean) => boolean)) => {
+    const newValue = typeof value === 'function' ? value(menuOpen) : value;
+    setMenuOpenState(newValue);
+    if (setOpenProp) setOpenProp(newValue);
+  };
+
 
   // Get user from Redux
   const { user } = useSelector((state: any) => state.auth);
 
   // Also check NextAuth session as fallback
   const { data: session } = useSession();
+
+  // Social auth mutation
+  const [socialAuth, { isSuccess: socialAuthSuccess }] = useSocialAuthMutation();
 
   // Use either Redux user or NextAuth session user
   const currentUser = user || session?.user;
@@ -38,6 +67,24 @@ const Header: FC = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    if (session) {
+      setModalOpen(false);
+      setRoute("Login");
+    }
+  }, [session]);
+
+  // Handle social authentication
+  useEffect(() => {
+    if (!user && session?.user) {
+      socialAuth({
+        email: session.user.email || "",
+        name: session.user.name || "",
+        avatar: session.user.image || "",
+      });
+    }
+  }, [user, session, socialAuth]);
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -46,6 +93,7 @@ const Header: FC = () => {
         setProfileDropdown(false);
       }
     };
+
     document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
@@ -67,8 +115,8 @@ const Header: FC = () => {
       {/* Navbar */}
       <div
         className={`${scrolled
-            ? "fixed top-0 left-0 w-full h-[80px] z-50 border-b border-transparent dark:border-[#ffffff1c] shadow-xl transition-all duration-500 bg-white dark:bg-gradient-to-b dark:from-gray-900 dark:to-black"
-            : "w-full h-[80px] border-b border-transparent dark:border-[#ffffff1c]"
+          ? "fixed top-0 left-0 w-full h-[80px] z-50 border-b border-transparent dark:border-[#ffffff1c] shadow-xl transition-all duration-500 bg-white dark:bg-gradient-to-b dark:from-gray-900 dark:to-black"
+          : "w-full h-[80px] border-b border-transparent dark:border-[#ffffff1c]"
           }`}
       >
         <div className="w-[95%] md:w-[92%] mx-auto h-full flex items-center justify-between">
