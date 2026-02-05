@@ -123,7 +123,7 @@ const Header: FC<Props> = ({ activeItem: activeItemProp, setOpen: setOpenProp, r
           {/* Logo */}
           <Link
             href="/"
-            className="text-[27px] font-poppins font-medium text-black dark:text-white"
+            className="text-[27px] font-poppins font-bold text-black dark:text-white"
           >
             ELearning
           </Link>
