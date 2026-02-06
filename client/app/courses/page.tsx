@@ -19,35 +19,14 @@ const CoursesContent = () => {
     const { data: categories } = useGetHeroDataQuery("Categories", {});
     const [route, setRoute] = useState("Login");
     const [open, setOpen] = useState(false);
-    const [courses, setCourses] = useState([]);
     const [category, setCategory] = useState("All");
     const layoutCategories = categories?.layout?.categories;
 
-    useEffect(() => {
-
-        const allCourses = (data?.courses ?? data?.course ?? []);
-        if (!allCourses.length) {
-            setCourses([]);
-            return;
-        }
-        if (searchTerm) {
-            setCourses(
-                allCourses.filter((item: any) =>
-                    item.name.toLowerCase().includes(searchTerm.toLowerCase())
-                )
-            );
-        } else if (category === "All") {
-            setCourses(allCourses);
-        } else {
-            setCourses(
-                allCourses.filter(
-                    (item: any) =>
-                        item.categories &&
-                        item.categories.toLowerCase() === category.toLowerCase()
-                )
-            );
-        }
-    }, [category, data, searchTerm]);
+    const courses = ((data?.courses ?? data?.course ?? []) as any[]).filter((item: any) => {
+        const matchesSearch = searchTerm ? item.name.toLowerCase().includes(searchTerm.toLowerCase()) : true;
+        const matchesCategory = category === "All" ? true : item.categories?.toLowerCase() === category.toLowerCase();
+        return matchesSearch && matchesCategory;
+    });
 
     return (
         <>
@@ -82,8 +61,8 @@ const CoursesContent = () => {
                                 <div key={index}>
                                     <div
                                         className={`h-[35px] ${category === item.title
-                                                ? "bg-[crimson]"
-                                                : "bg-[#5050cb]"
+                                            ? "bg-[crimson]"
+                                            : "bg-[#5050cb]"
                                             } m-3 px-3 rounded-[30px] flex items-center justify-center font-Poppins cursor-pointer`}
                                         onClick={() => setCategory(item.title)}
                                     >
