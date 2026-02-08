@@ -21,7 +21,7 @@ const Hero: FC<Props> = () => {
     };
 
     return (
-        <div className="w-full h-[calc(100vh-80px)] flex flex-col lg:flex-row items-center justify-center lg:justify-between px-6 lg:px-16 py-8 lg:py-0 relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
+        <div className="w-full min-h-[calc(100vh-80px)] flex flex-col lg:flex-row items-center justify-center lg:justify-between px-6 lg:px-16 py-12 lg:py-0 relative overflow-hidden bg-gradient-to-br from-blue-50/50 via-white to-purple-50/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800">
             {/* Animated background circles */}
             <div className="absolute top-[50px] left-[50px] w-[350px] h-[350px] lg:w-[600px] lg:h-[600px] hero_animation rounded-full opacity-30 blur-3xl" />
             <div className="absolute bottom-[100px] right-[50px] w-[200px] h-[200px] lg:w-[400px] lg:h-[400px] bg-gradient-to-tr from-purple-400 to-pink-400 rounded-full opacity-20 blur-3xl" />

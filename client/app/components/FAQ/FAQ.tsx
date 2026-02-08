@@ -8,13 +8,7 @@ type Props = {}
 const FAQ = (props: Props) => {
     const { data } = useGetHeroDataQuery("FAQ", {});
     const [activeQuestion, setActiveQuestion] = useState(null);
-    const [questions, setQuestions] = useState<any[]>([]);
-
-    useEffect(() => {
-        if (data) {
-            setQuestions(data.layout.faq);
-        }
-    }, [data]);
+    const questions = data?.layout?.faq || [];
 
     const toggleQuestion = (id: any) => {
         setActiveQuestion(activeQuestion === id ? null : id);
@@ -31,8 +25,7 @@ const FAQ = (props: Props) => {
                         {questions.map((q: any) => (
                             <div
                                 key={q._id}
-                                className={`${q._id !== questions[0]?._id && "border-t"
-                                    } border-gray-200 pt-6`}
+                                className={`border-gray-200 pt-6`}
                             >
                                 <dt className="text-lg">
                                     <button

@@ -115,8 +115,8 @@ const Header: FC<Props> = ({ activeItem: activeItemProp, setOpen: setOpenProp, r
       {/* Navbar */}
       <div
         className={`${scrolled
-          ? "fixed top-0 left-0 w-full h-[80px] z-50 border-b border-transparent dark:border-[#ffffff1c] shadow-xl transition-all duration-500 bg-white dark:bg-gradient-to-b dark:from-gray-900 dark:to-black"
-          : "w-full h-[80px] border-b border-transparent dark:border-[#ffffff1c]"
+          ? "fixed top-0 left-0 w-full h-[80px] z-[80] border-b border-[#0000000c] dark:border-[#ffffff1c] shadow-xl bg-white/90 dark:bg-gray-900/90 backdrop-blur-md transition-all duration-300"
+          : "w-full h-[80px] z-[80] border-b border-[#0000000c] dark:border-[#ffffff1c] shadow-sm bg-white dark:bg-black"
           }`}
       >
         <div className="w-[95%] md:w-[92%] mx-auto h-full flex items-center justify-between">
