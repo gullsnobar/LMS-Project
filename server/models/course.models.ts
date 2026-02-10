@@ -56,7 +56,7 @@ export interface ICourse extends Document {
   instructor: object;
 }
 
-/* -------------------- Schemas -------------------- */
+
 
 const reviewSchema = new Schema<IReview>(
   {
