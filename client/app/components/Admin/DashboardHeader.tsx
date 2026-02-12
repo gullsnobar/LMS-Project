@@ -1,23 +1,21 @@
+"use client";
 import {
   useGetAllNotificationsQuery,
   useUpdateNotificationStatusMutation,
 } from "../../../redux/features/notifications/notificationApi";
 import { ThemeSwitcher } from "../../utils/ThemeSwitcher";
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { IoMdNotificationsOutline } from "react-icons/io";
-const ENDPOINT =
-  process.env.NEXT_PUBLIC_SOCKET_SERVER_URI ||
-  process.env.NEXT_PUBLIC_SOCKET_URI ||
-  "/";
 import socketIO from "socket.io-client";
-const socketId = socketIO(ENDPOINT, { transports: ["websocket"] });
+import { format } from "timeago.js";
+const ENDPOINT = process.env.NEXT_PUBLIC_SOCKET_SERVER_URI || "";
+const socket = socketIO(ENDPOINT, { transports: ["websocket"] });
 
 
 type Props = {
   open?: boolean;
-  setOpen?: any;
+  setOpen?: (open: boolean) => void;
 };
-import { format } from "timeago.js";
 const DashboardHeader: FC<Props> = ({ open, setOpen }) => {
   const [notifications, setNotifications] = useState<any[]>([]);
   const { data, refetch } = useGetAllNotificationsQuery(undefined, {
@@ -29,14 +27,19 @@ const DashboardHeader: FC<Props> = ({ open, setOpen }) => {
   ] = useUpdateNotificationStatusMutation();
 
 
-  const [audio] = useState(new Audio(
-    "https://res.cloudinary.com/dasdrngo1/video/upload/v1715355770/notifications/mixkit-bubble-pop-up-alert-notification-2357_wbwviv.wav"
-  ));
+  /* 
+    The audio object should be initialized only on the client side to avoid SSR issues.
+    However, creating new Audio() inside useState initializer actually runs on every render unless lazy.
+    Better yet is to use useRef or useEffect.
+  */
+  // const [audio] = useState<HTMLAudioElement | null>(null);
 
-  const playerNotificationSound = () => {
-    // autoplay can be blocked until the user interacts; avoid unhandled promise rejections
-    audio.play().catch(() => {});
-  }
+  const playNotificationSound = () => {
+    const audio = new Audio(
+      "https://res.cloudinary.com/dasdrngo1/video/upload/v1715355770/notifications/mixkit-bubble-pop-up-alert-notification-2357_wbwviv.wav"
+    );
+    audio.play();
+  };
 
   useEffect(() => {
     if (data) {
@@ -45,30 +48,25 @@ const DashboardHeader: FC<Props> = ({ open, setOpen }) => {
         .slice()
         .sort(
           (a: any, b: any) =>
-            new Date(b?.createdAt || 0).getTime() -
-            new Date(a?.createdAt || 0).getTime()
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
       setNotifications(unread);
     }
     if (isSuccess) {
       refetch();
     }
-    audio.load();
+    // audio.load(); // Removed as we instantiate audio on demand now
   }, [data, isSuccess, refetch]);
 
   useEffect(() => {
-    const onNewNotification = (payload: any) => {
-      if (payload) {
-        refetch();
-      }
-      playerNotificationSound();
-    };
-
-    socketId.on("newNotification", onNewNotification);
+    socket.on("newNotification", (data: any) => {
+      refetch();
+      playNotificationSound();
+    });
     return () => {
-      socketId.off("newNotification", onNewNotification);
+      socket.off("newNotification");
     };
-  }, [refetch, audio]);
+  }, []);
 
 
   const handleNotificationStatusChange = async (id: string) => {
@@ -76,61 +74,14 @@ const DashboardHeader: FC<Props> = ({ open, setOpen }) => {
   };
 
 
-  /* 
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
- 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      audioRef.current = new Audio(
-        "https://res.cloudinary.com/dasdrngo1/video/upload/v1715355770/notifications/mixkit-bubble-pop-up-alert-notification-2357_wbwviv.wav"
-      );
-    }
-  }, []);
-  */
-  /*
-    const playNotificationSound = () => {
-      audioRef.current?.play().catch((err) => {
-        console.error("Error Audio Playing: ", err);
-      });
-    };
-    /*
-    When notification data is available, store only the unread ones in state.Also, if a notification status was updated successfully, refetch the list. 
-    
-  
-    
-  Set up a socket listener for real-time "newNotification" events from the server. When a new notification arrives, it refetches the notification list and plays a sound.
-  */
 
-
-
-  // Close dropdown when clicking outside
-  /*useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setOpen(false);
-      }
-    };
-    if (open) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [open, setOpen]);
-
-  */
   return (
     <div className="w-full flex items-center justify-end p-6 fixed top-5 right-0 z-[9999]">
       <ThemeSwitcher />
       {/* Notification bell icon */}
       <div
         className="relative cursor-pointer m-2"
-        onClick={() => setOpen(!open)}
+        onClick={() => setOpen && setOpen(!open)}
       >
         <IoMdNotificationsOutline className="text-2xl cursor-pointer text-black dark:text-white" />
         <span className="absolute -top-2 -right-2 bg-[#3ccba0] rounded-full w-5 h-5 text-[12px] flex items-center justify-center text-white">
