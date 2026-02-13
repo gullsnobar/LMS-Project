@@ -27,12 +27,6 @@ const DashboardHeader: FC<Props> = ({ open, setOpen }) => {
   ] = useUpdateNotificationStatusMutation();
 
 
-  /* 
-    The audio object should be initialized only on the client side to avoid SSR issues.
-    However, creating new Audio() inside useState initializer actually runs on every render unless lazy.
-    Better yet is to use useRef or useEffect.
-  */
-  // const [audio] = useState<HTMLAudioElement | null>(null);
 
   const playNotificationSound = () => {
     const audio = new Audio(
