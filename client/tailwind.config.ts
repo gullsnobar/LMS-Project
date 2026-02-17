@@ -6,13 +6,12 @@ const config: Config = {
         './components/**/*.{js,ts,jsx,tsx,mdx}',
         './app/**/*.{js,ts,jsx,tsx,mdx}',
     ],
-
     darkMode: "class",
     theme: {
         extend: {
             fontFamily: {
-                poppins: ["Poppins", "sans"],
-                josefin: ["Josefin Sans", "sans"],
+                Poppins: ["var(--font-Poppins)", "sans-serif"],
+                Josefin: ["var(--font-Josefin)", "sans-serif"],
             },
             backgroundImage: {
                 'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
@@ -24,19 +23,13 @@ const config: Config = {
                 "1100px": "1100px",
                 "1200px": "1200px",
                 "1300px": "1300px",
-                "1400px": "1400px",
                 "1500px": "1500px",
                 "800px": "800px",
-                "700px": "700px",
-                "600px": "600px",
-                "500px": "500px",
                 "400px": "400px",
-                "300px": "300px",
-                "200px": "200px",
             }
         },
     },
     plugins: [],
 }
 
-export default config
+export default config;
