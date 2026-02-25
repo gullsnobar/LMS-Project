@@ -165,3 +165,87 @@ body {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+/* Dashboard Specific Styles */
+.dashboard-card {
+  @apply bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dashboard-card:hover {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+html.dark .dashboard-card:hover {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Stat card glow effect */
+.stat-glow-blue { box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15); }
+.stat-glow-purple { box-shadow: 0 4px 20px rgba(147, 51, 234, 0.15); }
+.stat-glow-amber { box-shadow: 0 4px 20px rgba(245, 158, 11, 0.15); }
+.stat-glow-green { box-shadow: 0 4px 20px rgba(34, 197, 94, 0.15); }
+
+html.dark .stat-glow-blue { box-shadow: 0 4px 20px rgba(59, 130, 246, 0.25); }
+html.dark .stat-glow-purple { box-shadow: 0 4px 20px rgba(147, 51, 234, 0.25); }
+html.dark .stat-glow-amber { box-shadow: 0 4px 20px rgba(245, 158, 11, 0.25); }
+html.dark .stat-glow-green { box-shadow: 0 4px 20px rgba(34, 197, 94, 0.25); }
+
+/* Stripe Elements custom styling */
+.StripeElement {
+  padding: 12px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #f9fafb;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+html.dark .StripeElement {
+  border-color: #374151;
+  background: #1f2937;
+}
+
+.StripeElement--focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+}
+
+.StripeElement--invalid {
+  border-color: #ef4444;
+}
+
+/* Dashboard sidebar transition */
+@keyframes sidebarSlideIn {
+  from { transform: translateX(-100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.sidebar-enter {
+  animation: sidebarSlideIn 0.3s ease-out;
+}
+
+/* Course progress bar */
+.progress-bar-bg {
+  background: linear-gradient(90deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+}
+
+html.dark .progress-bar-bg {
+  background: linear-gradient(90deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+}
+
+.progress-bar-fill {
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Glass morphism effect */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+html.dark .glass {
+  background: rgba(17, 24, 39, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}

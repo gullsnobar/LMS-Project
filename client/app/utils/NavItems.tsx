@@ -10,6 +10,7 @@ export const navItemsData = [
   { name: "About", url: "/about" },
   { name: "Policy", url: "/policy" },
   { name: "FAQ", url: "/faq" },
+  { name: "Dashboard", url: "/dashboard" },
 ];
 
 type Props = {

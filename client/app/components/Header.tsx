@@ -174,6 +174,15 @@ const Header: FC<Props> = ({ activeItem: activeItemProp, setOpen: setOpenProp, r
                       <span>My Profile</span>
                     </Link>
 
+                    <Link
+                      href="/dashboard"
+                      className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      onClick={() => setProfileDropdown(false)}
+                    >
+                      <MdDashboard size={18} />
+                      <span>My Dashboard</span>
+                    </Link>
+
                     {currentUser.role === "admin" && (
                       <Link
                         href="/admin"
@@ -248,6 +257,15 @@ const Header: FC<Props> = ({ activeItem: activeItemProp, setOpen: setOpenProp, r
                     >
                       <BiUser size={16} />
                       <span>Profile</span>
+                    </Link>
+
+                    <Link
+                      href="/dashboard"
+                      className="flex items-center gap-2 px-3 py-2 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      onClick={() => setProfileDropdown(false)}
+                    >
+                      <MdDashboard size={16} />
+                      <span>Dashboard</span>
                     </Link>
 
                     {currentUser.role === "admin" && (

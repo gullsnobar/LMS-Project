@@ -109,26 +109,46 @@ const CheckOutForm = ({ data, user, refetch, setOpen }: Props) => {
         }
     }, [orderData, error, courseId, courseName, userId, refetch, router]);
     return (
-        <form id="payment-form" onSubmit={handleSubmit}>
-            <LinkAuthenticationElement
-                id="link-authentication-element"
-            // Access the email value like so:
-            // onChange={(event) => {
-            //  setEmail(event.value.email);
-            // }}
-            //
-            // Prefill the email field like so:
-            // options={{defaultValues: {email: 'foo@bar.com'}}}
-            />
-            <PaymentElement id="payment-element" />
-            <button disabled={isLoading || !stripe || !elements} id="submit">
-                <span id="button-text" className={`${styles.button} mt-2 !h-[35px]`}>
-                    {isLoading ? "Paying..." : "Pay Now"}
-                </span>
+        <form id="payment-form" onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-3">
+                <LinkAuthenticationElement
+                    id="link-authentication-element"
+                    options={{
+                        defaultValues: {
+                            email: user?.email || "",
+                        },
+                    }}
+                />
+                <PaymentElement
+                    id="payment-element"
+                    options={{
+                        layout: "tabs",
+                    }}
+                />
+            </div>
+            <button
+                disabled={isLoading || !stripe || !elements}
+                id="submit"
+                className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 text-sm"
+            >
+                {isLoading ? (
+                    <span className="flex items-center justify-center gap-2">
+                        <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        Processing Payment...
+                    </span>
+                ) : (
+                    `Pay $${(data?.price || 0).toFixed(2)}`
+                )}
             </button>
 
             {message && (
-                <div id="payment-message" className="text-[red] font-Poppins pt-2">
+                <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-sm text-red-600 dark:text-red-400">
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
                     {message}
                 </div>
             )}

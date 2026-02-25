@@ -8,6 +8,7 @@ import orderRouter from "./routes/order.route";
 import notificationRouter from "./routes/notification.route";
 import analyticsRouter from "./routes/analytics.route";
 import layoutRouter from "./routes/layout.route";
+import paymentRouter from "./routes/payment.route";
 
 const app: Application = express();
 
@@ -44,6 +45,9 @@ app.use("/api/orders", orderRouter);
 app.use("/api/notifications", notificationRouter);
 app.use("/api/analytics", analyticsRouter);
 app.use("/api/layout", layoutRouter);
+app.use("/api/v1", paymentRouter);
+// Also mount under /api/user for the client's baseURL
+app.use("/api/user", paymentRouter);
 
 /* =======================
    Error Handling Middleware
