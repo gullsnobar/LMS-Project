@@ -9,6 +9,8 @@ import { loadStripe } from "@stripe/stripe-js";
 import {
   useCreatePaymentIntentMutation,
   useGetStripePublishAbleKeyQuery,
+  useApplyCouponMutation,
+  useEnrollFreeCourseMutation,
 } from "../../../redux/features/orders/orderApi";
 
 type Props = {
@@ -26,13 +28,17 @@ const CourseDetailsPage: FC<Props> = ({ id }: Props) => {
     createPaymentIntent,
     { data: paymentIntentdata, error: paymentIntentError },
   ] = useCreatePaymentIntentMutation({});
+  const [applyCoupon, { data: couponData, error: couponError, isLoading: couponLoading }] =
+    useApplyCouponMutation();
+  const [enrollFreeCourse, { data: freeEnrollData, error: freeEnrollError, isLoading: freeEnrollLoading }] =
+    useEnrollFreeCourseMutation();
   const [stripePromise, setStripePromise] = useState<any>(null);
   const [clientSecret, setClientSecret] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
  
   useEffect(() => {
     if (config) {
       const publishableKey = config?.publishableKey;
-      // initializes the Stripe.js SDK using your public Stripe publishable key
       setStripePromise(loadStripe(publishableKey));
     }   
   }, [config]);
@@ -49,6 +55,29 @@ const CourseDetailsPage: FC<Props> = ({ id }: Props) => {
     }
   }, [paymentIntentError]);
 
+  useEffect(() => {
+    if (couponData?.success) {
+      setAppliedCoupon(couponData);
+    }
+  }, [couponData]);
+
+  // Handle applying a coupon
+  const handleApplyCoupon = async (couponCode: string) => {
+    if (!couponCode) return;
+    setAppliedCoupon(null);
+    await applyCoupon({ code: couponCode, courseId: id });
+  };
+
+  // Remove applied coupon
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+  };
+
+  // Free course enrollment handler
+  const handleFreeEnroll = async () => {
+    await enrollFreeCourse({ courseId: id });
+  };
+
   // Trigger payment intent creation when the user actually wants to buy
   const handleCreatePaymentIntent = async (price: number) => {
     if (!price || price <= 0) {
@@ -59,7 +88,11 @@ const CourseDetailsPage: FC<Props> = ({ id }: Props) => {
     const amount = Math.round(price * 100);
 
     try {
-      await createPaymentIntent(amount);
+      await createPaymentIntent({
+        amount,
+        courseId: id,
+        couponCode: appliedCoupon?.coupon?.code || undefined,
+      });
     } catch (error) {
       console.error("Failed to create payment intent:", error);
     }
@@ -91,6 +124,15 @@ const CourseDetailsPage: FC<Props> = ({ id }: Props) => {
               stripePromise={stripePromise}
               clientSecret={clientSecret}
               createPaymentIntentFn={handleCreatePaymentIntent}
+              onApplyCoupon={handleApplyCoupon}
+              onRemoveCoupon={handleRemoveCoupon}
+              appliedCoupon={appliedCoupon}
+              couponError={couponError}
+              couponLoading={couponLoading}
+              onFreeEnroll={handleFreeEnroll}
+              freeEnrollData={freeEnrollData}
+              freeEnrollError={freeEnrollError}
+              freeEnrollLoading={freeEnrollLoading}
             />
           )}
           <Footer />

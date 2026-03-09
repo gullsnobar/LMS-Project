@@ -18,19 +18,48 @@ export const orderApi = apiSlice.injectEndpoints({
     }),
 
     createPaymentIntent: builder.mutation({
-      query: (amount) => ({
+      query: ({ amount, courseId, couponCode }) => ({
         url: "payment/process",
         method: "POST",
-        body: { amount },
+        body: { amount, courseId, couponCode },
         credentials: "include" as const,
       }),
     }),
 
     createOrder: builder.mutation({
-      query: ({ courseId, payment_info, userId }) => ({
+      query: ({ courseId, payment_info, userId, couponCode }) => ({
         url: "create-order",
         method: "POST",
-        body: { courseId, payment_info, userId },
+        body: { courseId, payment_info, userId, couponCode },
+        credentials: "include" as const,
+      }),
+    }),
+
+    // Free course enrollment
+    enrollFreeCourse: builder.mutation({
+      query: ({ courseId }) => ({
+        url: "payment/enroll-free",
+        method: "POST",
+        body: { courseId },
+        credentials: "include" as const,
+      }),
+    }),
+
+    // Apply coupon code
+    applyCoupon: builder.mutation({
+      query: ({ code, courseId }) => ({
+        url: "apply-coupon",
+        method: "POST",
+        body: { code, courseId },
+        credentials: "include" as const,
+      }),
+    }),
+
+    // Get order receipt
+    getOrderReceipt: builder.query({
+      query: (orderId) => ({
+        url: `payment/receipt/${orderId}`,
+        method: "GET",
         credentials: "include" as const,
       }),
     }),
@@ -42,4 +71,7 @@ export const {
   useCreateOrderMutation,
   useCreatePaymentIntentMutation,
   useGetStripePublishAbleKeyQuery,
+  useEnrollFreeCourseMutation,
+  useApplyCouponMutation,
+  useGetOrderReceiptQuery,
 } = orderApi;

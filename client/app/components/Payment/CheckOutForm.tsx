@@ -18,10 +18,11 @@ type Props = {
     setOpen: any;
     data: any;
     user: any;
-    refetch: any
+    refetch: any;
+    couponCode?: string;
 };
 
-const CheckOutForm = ({ data, user, refetch, setOpen }: Props) => {
+const CheckOutForm = ({ data, user, refetch, setOpen, couponCode }: Props) => {
     const stripe = useStripe();
     const elements = useElements();
     const router = useRouter();
@@ -63,7 +64,7 @@ const CheckOutForm = ({ data, user, refetch, setOpen }: Props) => {
             setIsLoading(false);
         } else if (paymentIntent && paymentIntent.status === "succeeded") {
             setIsLoading(false);
-            createOrder({ courseId, payment_info: paymentIntent, userId });
+            createOrder({ courseId, payment_info: paymentIntent, userId, couponCode });
         }
     };
     useEffect(() => {

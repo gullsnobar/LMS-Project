@@ -14,12 +14,24 @@ type Props = {
   setOpen: any;
   setRoute: any;
   createPaymentIntentFn: (price: number) => Promise<void> | void;
+  onApplyCoupon: (code: string) => Promise<void>;
+  onRemoveCoupon: () => void;
+  appliedCoupon: any;
+  couponError: any;
+  couponLoading: boolean;
+  onFreeEnroll: () => Promise<void>;
+  freeEnrollData: any;
+  freeEnrollError: any;
+  freeEnrollLoading: boolean;
 };
 import CheckOutForm from "../Payment/CheckOutForm";
 import { useLoadUserQuery } from "../../../redux/features/api/apiSlice";
 import Image from "next/image";
 import { VscVerifiedFilled } from "react-icons/vsc";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import { userLoggedIn } from "../../../redux/features/auth/authSlice";
 
 const CourseDetails: FC<Props> = ({
   data,
@@ -28,8 +40,20 @@ const CourseDetails: FC<Props> = ({
   setRoute,
   setOpen: OpenAuthModel,
   createPaymentIntentFn,
+  onApplyCoupon,
+  onRemoveCoupon,
+  appliedCoupon,
+  couponError,
+  couponLoading,
+  onFreeEnroll,
+  freeEnrollData,
+  freeEnrollError,
+  freeEnrollLoading,
 }) => {
   const reduxUser = useSelector((state: any) => state.auth.user);
+  const token = useSelector((state: any) => state.auth.token);
+  const dispatch = useDispatch();
+  const router = useRouter();
   // Prefer Redux user (loaded in app/layout.tsx); fall back to API if needed.
   const {
     data: userData,
@@ -38,6 +62,7 @@ const CourseDetails: FC<Props> = ({
     refetch,
   } = useLoadUserQuery(undefined, { skip: !!reduxUser });
   const [open, setOpen] = useState(false);
+  const [couponCode, setCouponCode] = useState("");
 
   const user = reduxUser || userData?.user;
   const isLoggedIn = !!user && typeof user === "object" && !!user._id;
@@ -54,13 +79,49 @@ const CourseDetails: FC<Props> = ({
       return courseId?.toString?.() === data?._id?.toString?.();
     });
 
+  // Calculate display price considering coupon
+  const displayPrice = appliedCoupon?.finalPrice ?? data.price;
+
+  // Handle free enrollment success
+  useEffect(() => {
+    if (freeEnrollData?.success) {
+      toast.success("Successfully enrolled in the course!");
+      // Update Redux state
+      if (user && data?._id) {
+        const existingCourses = Array.isArray(user.courses) ? user.courses : [];
+        dispatch(
+          userLoggedIn({
+            accessToken: token,
+            user: {
+              ...user,
+              courses: [...existingCourses, { courseId: data._id }],
+            },
+          })
+        );
+      }
+      router.push(`/course-access/${data._id}`);
+    }
+    if (freeEnrollError) {
+      const errMsg = (freeEnrollError as any)?.data?.message || "Failed to enroll";
+      toast.error(errMsg);
+    }
+  }, [freeEnrollData, freeEnrollError]);
+
+  // Handle coupon error
+  useEffect(() => {
+    if (couponError) {
+      const errMsg = (couponError as any)?.data?.message || "Invalid coupon";
+      toast.error(errMsg);
+    }
+  }, [couponError]);
+
   const handleOrder = async () => {
     // If auth is still resolving, try one refetch before deciding.
     if (!user && (isLoadingUser || isFetchingUser)) {
       const res: any = await refetch();
       const refreshedUser = res?.data?.user;
       if (refreshedUser) {
-        await createPaymentIntentFn(data.price);
+        await createPaymentIntentFn(displayPrice);
         setOpen(true);
         return;
       }
@@ -72,8 +133,17 @@ const CourseDetails: FC<Props> = ({
       return;
     }
 
-    await createPaymentIntentFn(data.price);
+    await createPaymentIntentFn(displayPrice);
     setOpen(true);
+  };
+
+  const handleFreeEnrollment = async () => {
+    if (!isLoggedIn) {
+      setRoute("Login");
+      OpenAuthModel(true);
+      return;
+    }
+    await onFreeEnroll();
   };
 
   return (
@@ -251,19 +321,74 @@ const CourseDetails: FC<Props> = ({
               <div className="mt-4 p-5 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-lg">
                 <div className="flex items-baseline gap-3 mb-1">
                   <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                    {data.price === 0 ? "Free" : `$${data.price}`}
+                    {data.price === 0 ? "Free" : `$${displayPrice}`}
                   </h1>
-                  {data.estimatedPrice > data.price && (
+                  {appliedCoupon && (
+                    <h5 className="text-lg line-through text-gray-400 dark:text-gray-500">
+                      ${data.price}
+                    </h5>
+                  )}
+                  {!appliedCoupon && data.estimatedPrice > data.price && (
                     <h5 className="text-lg line-through text-gray-400 dark:text-gray-500">
                       ${data.estimatedPrice}
                     </h5>
                   )}
-                  {data.estimatedPrice > data.price && (
+                  {data.estimatedPrice > data.price && !appliedCoupon && (
                     <span className="px-2.5 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg text-xs font-bold">
                       {discountPercentagePrice}% OFF
                     </span>
                   )}
+                  {appliedCoupon && (
+                    <span className="px-2.5 py-1 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg text-xs font-bold">
+                      COUPON APPLIED
+                    </span>
+                  )}
                 </div>
+
+                {/* Coupon Applied Badge */}
+                {appliedCoupon && (
+                  <div className="mt-2 mb-3 flex items-center justify-between p-2.5 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl">
+                    <div className="flex items-center gap-2">
+                      <svg className="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                      </svg>
+                      <span className="text-sm font-medium text-green-700 dark:text-green-300">
+                        {appliedCoupon.coupon.code} — Save ${appliedCoupon.discountAmount.toFixed(2)}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => {
+                        onRemoveCoupon();
+                        setCouponCode("");
+                      }}
+                      className="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-200"
+                    >
+                      <IoCloseOutline size={18} />
+                    </button>
+                  </div>
+                )}
+
+                {/* Coupon Input (only for paid courses the user hasn't bought) */}
+                {!isPurchased && data.price > 0 && !appliedCoupon && (
+                  <div className="mt-3 mb-3">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        placeholder="Enter coupon code"
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                        className="flex-1 px-3 py-2 text-sm border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                      />
+                      <button
+                        onClick={() => onApplyCoupon(couponCode)}
+                        disabled={!couponCode || couponLoading}
+                        className="px-4 py-2 text-sm font-semibold bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl hover:bg-gray-800 dark:hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        {couponLoading ? "..." : "Apply"}
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 {/* Buy or enter button depending on purchase */}
                 {isPurchased ? (
@@ -277,12 +402,30 @@ const CourseDetails: FC<Props> = ({
                     </svg>
                     Continue Learning
                   </Link>
+                ) : data.price === 0 ? (
+                  <button
+                    className="mt-4 w-full py-3.5 px-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 text-sm cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                    onClick={handleFreeEnrollment}
+                    disabled={freeEnrollLoading}
+                  >
+                    {freeEnrollLoading ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        Enrolling...
+                      </span>
+                    ) : (
+                      "Enroll for Free"
+                    )}
+                  </button>
                 ) : (
                   <button
                     className="mt-4 w-full py-3.5 px-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 text-sm cursor-pointer"
                     onClick={handleOrder}
                   >
-                    {data.price === 0 ? "Enroll for Free" : `Buy Now - $${data.price}`}
+                    Buy Now - ${displayPrice}
                   </button>
                 )}
 
@@ -349,19 +492,50 @@ const CourseDetails: FC<Props> = ({
                     <p className="text-xs text-gray-500 dark:text-gray-400">{data.level || "All Levels"}</p>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className="text-lg font-bold text-gray-900 dark:text-white">${data.price}</p>
-                    {data.estimatedPrice > data.price && (
+                    <p className="text-lg font-bold text-gray-900 dark:text-white">${displayPrice}</p>
+                    {appliedCoupon && (
+                      <p className="text-xs text-gray-400 line-through">${data.price}</p>
+                    )}
+                    {!appliedCoupon && data.estimatedPrice > data.price && (
                       <p className="text-xs text-gray-400 line-through">${data.estimatedPrice}</p>
                     )}
                   </div>
                 </div>
+
+                {/* Coupon Discount Summary in Modal */}
+                {appliedCoupon && (
+                  <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500 dark:text-gray-400">Subtotal</span>
+                      <span className="text-gray-700 dark:text-gray-300">${data.price}</span>
+                    </div>
+                    <div className="flex justify-between text-sm mt-1">
+                      <span className="text-green-600 dark:text-green-400">
+                        Coupon ({appliedCoupon.coupon.code})
+                      </span>
+                      <span className="text-green-600 dark:text-green-400">
+                        -${appliedCoupon.discountAmount.toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm font-bold mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+                      <span className="text-gray-900 dark:text-white">Total</span>
+                      <span className="text-gray-900 dark:text-white">${displayPrice}</span>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Stripe Payment Form */}
               <div className="p-5">
                 {stripePromise && clientSecret && (
                   <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: "stripe", variables: { colorPrimary: "#667eea", borderRadius: "12px" } } }}>
-                    <CheckOutForm setOpen={setOpen} refetch={refetch} data={data} user={user} />
+                    <CheckOutForm
+                      setOpen={setOpen}
+                      refetch={refetch}
+                      data={{ ...data, price: displayPrice }}
+                      user={user}
+                      couponCode={appliedCoupon?.coupon?.code}
+                    />
                   </Elements>
                 )}
               </div>

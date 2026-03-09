@@ -8,9 +8,17 @@ import orderRouter from "./routes/order.route";
 import notificationRouter from "./routes/notification.route";
 import analyticsRouter from "./routes/analytics.route";
 import layoutRouter from "./routes/layout.route";
-import paymentRouter from "./routes/payment.route";
+import paymentRouter, { stripeWebhook } from "./routes/payment.route";
+import couponRouter from "./routes/coupon.route";
 
 const app: Application = express();
+
+// Stripe webhook needs raw body — must be before express.json()
+app.post(
+  "/api/v1/payment/webhook",
+  express.raw({ type: "application/json" }),
+  stripeWebhook
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -46,8 +54,10 @@ app.use("/api/notifications", notificationRouter);
 app.use("/api/analytics", analyticsRouter);
 app.use("/api/layout", layoutRouter);
 app.use("/api/v1", paymentRouter);
+app.use("/api/v1", couponRouter);
 // Also mount under /api/user for the client's baseURL
 app.use("/api/user", paymentRouter);
+app.use("/api/user", couponRouter);
 
 /* =======================
    Error Handling Middleware

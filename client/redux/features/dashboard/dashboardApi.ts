@@ -16,8 +16,28 @@ export const dashboardApi = apiSlice.injectEndpoints({
         credentials: "include" as const,
       }),
     }),
+    getOrderReceipt: builder.query({
+      query: (orderId) => ({
+        url: `payment/receipt/${orderId}`,
+        method: "GET",
+        credentials: "include" as const,
+      }),
+    }),
+    // Admin: Process refund
+    processRefund: builder.mutation({
+      query: ({ orderId, reason }) => ({
+        url: "payment/refund",
+        method: "POST",
+        body: { orderId, reason },
+        credentials: "include" as const,
+      }),
+    }),
   }),
 });
 
-export const { useGetUserDashboardStatsQuery, useGetUserOrdersQuery } =
-  dashboardApi;
+export const {
+  useGetUserDashboardStatsQuery,
+  useGetUserOrdersQuery,
+  useGetOrderReceiptQuery,
+  useProcessRefundMutation,
+} = dashboardApi;

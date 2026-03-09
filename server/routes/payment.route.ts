@@ -1,10 +1,14 @@
 import express from "express";
-import { isAuthenticated } from "../middleware/auth";
+import { isAuthenticated, authorizeRoles } from "../middleware/auth";
 import {
   sendStripePublishableKey,
   newPayment,
   getUserOrders,
   getUserDashboardStats,
+  enrollFreeCourse,
+  processRefund,
+  getOrderReceipt,
+  stripeWebhook,
 } from "../controllers/payment.controller";
 
 const paymentRouter = express.Router();
@@ -20,6 +24,28 @@ paymentRouter.post(
   newPayment
 );
 
+// Free course enrollment
+paymentRouter.post(
+  "/payment/enroll-free",
+  isAuthenticated,
+  enrollFreeCourse
+);
+
+// Admin: Process refund
+paymentRouter.post(
+  "/payment/refund",
+  isAuthenticated,
+  authorizeRoles("admin"),
+  processRefund
+);
+
+// Get order receipt
+paymentRouter.get(
+  "/payment/receipt/:orderId",
+  isAuthenticated,
+  getOrderReceipt
+);
+
 paymentRouter.get(
   "/user-orders",
   isAuthenticated,
@@ -32,4 +58,5 @@ paymentRouter.get(
   getUserDashboardStats
 );
 
+export { stripeWebhook };
 export default paymentRouter;
