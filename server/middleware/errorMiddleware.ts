@@ -1,10 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import ErrorHandler from '../utils/ErrorHandler';
 
-/**
- * Global Error Handling Middleware
- * Must have 4 parameters for Express to recognize it
- */
+
 const errorMiddleware = (
     err: any,
     req: Request,
