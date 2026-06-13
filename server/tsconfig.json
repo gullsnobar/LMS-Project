@@ -1,16 +1,17 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "CommonJS",
-    "moduleResolution": "node",
+    "module": "node16",
+    "moduleResolution": "node16",
+    "ignoreDeprecations": "5.0",
     "outDir": "dist",
     "rootDir": "./",
     "esModuleInterop": true,
     "strict": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "sourceMap": true,           // enable source maps to see errors in ts-node-dev
-    "noEmitOnError": false        // ensure ts-node-dev runs even if TS type errors exist
+    "sourceMap": true,
+    "noEmitOnError": false
   },
   "include": ["./**/*.ts"],
   "exclude": ["node_modules", "dist"]
