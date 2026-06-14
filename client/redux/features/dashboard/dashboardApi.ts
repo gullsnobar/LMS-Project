@@ -4,21 +4,21 @@ export const dashboardApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getUserDashboardStats: builder.query({
       query: () => ({
-        url: "user-dashboard-stats",
+        url: "/api/v1/user-dashboard-stats",
         method: "GET",
         credentials: "include" as const,
       }),
     }),
     getUserOrders: builder.query({
       query: () => ({
-        url: "user-orders",
+        url: "/api/v1/user-orders",
         method: "GET",
         credentials: "include" as const,
       }),
     }),
     getOrderReceipt: builder.query({
       query: (orderId) => ({
-        url: `payment/receipt/${orderId}`,
+        url: `/api/v1/payment/receipt/${orderId}`,
         method: "GET",
         credentials: "include" as const,
       }),
@@ -26,7 +26,7 @@ export const dashboardApi = apiSlice.injectEndpoints({
     // Admin: Process refund
     processRefund: builder.mutation({
       query: ({ orderId, reason }) => ({
-        url: "payment/refund",
+        url: "/api/v1/payment/refund",
         method: "POST",
         body: { orderId, reason },
         credentials: "include" as const,

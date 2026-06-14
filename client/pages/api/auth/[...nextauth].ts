@@ -13,7 +13,7 @@ export const authOptions: NextAuthOptions = {
             clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
         }),
     ],
-    secret: process.env.NEXTAUTH_SECRET,
+    secret: process.env.NEXTAUTH_SECRET || "your-secret-key-change-this-in-production",
     session: {
         strategy: "jwt",
         maxAge: 30 * 24 * 60 * 60, // 30 days
@@ -48,7 +48,7 @@ export const authOptions: NextAuthOptions = {
             // For example, sync with your backend
             if (account?.provider === "google" || account?.provider === "github") {
                 // Optional: Call your backend to create/update user
-                // await fetch(`${process.env.NEXT_PUBLIC_SERVER_URI}/auth/social-auth`, {
+                // await fetch(`${process.env.NEXT_PUBLIC_SERVER_URI}/api/users/social-auth`, {
                 //   method: "POST",
                 //   headers: { "Content-Type": "application/json" },
                 //   body: JSON.stringify({

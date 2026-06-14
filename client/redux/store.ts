@@ -18,11 +18,11 @@ export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 
 
-// call the refreah token function on every page load
+// call the refresh token function on every page load
 
 
 const initializeApp = async () => {
-    await store.dispatch(apiSlice.endpoints.refreashToken.initiate(undefined, { forceRefetch: true }))
+    await store.dispatch(apiSlice.endpoints.refreshToken.initiate(undefined, { forceRefetch: true }))
     await store.dispatch(apiSlice.endpoints.loadUser.initiate(undefined, { forceRefetch: true }))
 }
 

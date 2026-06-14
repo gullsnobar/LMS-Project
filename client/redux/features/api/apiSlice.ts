@@ -4,19 +4,19 @@ import { userLoggedIn } from "../auth/authSlice";
 export const apiSlice = createApi({
     reducerPath: "api",
     baseQuery: fetchBaseQuery({
-        baseUrl: process.env.NEXT_PUBLIC_SERVER_URI,
+        baseUrl: process.env.NEXT_PUBLIC_SERVER_URI || "http://localhost:5000",
     }),
     endpoints: (builder) => ({
-        refreashToken: builder.query<any, void>({
+        refreshToken: builder.query<any, void>({
             query: () => ({
-                url: "/auth/refreash-token",
+                url: "/api/users/refresh-token",
                 method: "POST",
                 withCredentials: true,
             }),
         }),
         loadUser: builder.query<any, void>({
             query: () => ({
-                url: "/auth/me",
+                url: "/api/users/me",
                 method: "GET",
                 withCredentials: true,
             }),
@@ -33,4 +33,4 @@ export const apiSlice = createApi({
     }),
 });
 
-export const { useRefreashTokenQuery, useLoadUserQuery } = apiSlice;
+export const { useRefreshTokenQuery, useLoadUserQuery } = apiSlice;

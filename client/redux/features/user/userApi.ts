@@ -5,7 +5,7 @@ export const userApi = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
         updateAvatar: builder.mutation({
             query: (avatar) => ({
-                url: "update-user-avatar",
+                url: "/api/users/update-user-avatar",
                 method: "PUT",
                 body: avatar,
                 credentials: "include",
@@ -14,7 +14,7 @@ export const userApi = apiSlice.injectEndpoints({
 
         editProfile: builder.mutation({
             query: ({ name, email }) => ({
-                url: "update-user-info",
+                url: "/api/users/update-user-info",
                 method: "PUT",
                 body: { name, email },
                 credentials: "include",
@@ -23,7 +23,7 @@ export const userApi = apiSlice.injectEndpoints({
 
         updatePassword: builder.mutation({
             query: ({ newPassword, oldPassword }) => ({
-                url: "update-user-password",
+                url: "/api/users/update-user-password",
                 method: "PUT",
                 body: { newPassword, oldPassword },
                 credentials: "include",
@@ -32,7 +32,7 @@ export const userApi = apiSlice.injectEndpoints({
 
         getAllUsers: builder.query({
             query: () => ({
-                url: "get-all-users",
+                url: "/api/users/get-users",
                 method: "GET",
                 credentials: "include",
             }),
@@ -40,7 +40,7 @@ export const userApi = apiSlice.injectEndpoints({
 
         updateUserRole: builder.mutation({
             query: ({ id, role }) => ({
-                url: "update-user-role",
+                url: "/api/users/update-user-role",
                 method: "PUT",
                 body: { id, role },
                 credentials: "include" as const,
@@ -49,8 +49,9 @@ export const userApi = apiSlice.injectEndpoints({
 
         deleteUser: builder.mutation({
             query: (id) => ({
-                url: `delete-user/${id}`,
+                url: `/api/users/delete-user`,
                 method: "DELETE",
+                body: { id },
                 credentials: "include" as const,
             }),
         }),

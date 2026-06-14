@@ -5,7 +5,7 @@ export const couponApi = apiSlice.injectEndpoints({
     // Admin: Create coupon
     createCoupon: builder.mutation({
       query: (data) => ({
-        url: "create-coupon",
+        url: "/api/v1/create-coupon",
         method: "POST",
         body: data,
         credentials: "include" as const,
@@ -15,7 +15,7 @@ export const couponApi = apiSlice.injectEndpoints({
     // Admin: Get all coupons
     getAllCoupons: builder.query({
       query: () => ({
-        url: "get-coupons",
+        url: "/api/v1/get-coupons",
         method: "GET",
         credentials: "include" as const,
       }),
@@ -24,7 +24,7 @@ export const couponApi = apiSlice.injectEndpoints({
     // Admin: Update coupon
     updateCoupon: builder.mutation({
       query: ({ id, ...data }) => ({
-        url: `update-coupon/${id}`,
+        url: `/api/v1/update-coupon/${id}`,
         method: "PUT",
         body: data,
         credentials: "include" as const,
@@ -34,7 +34,7 @@ export const couponApi = apiSlice.injectEndpoints({
     // Admin: Delete coupon
     deleteCoupon: builder.mutation({
       query: (id) => ({
-        url: `delete-coupon/${id}`,
+        url: `/api/v1/delete-coupon/${id}`,
         method: "DELETE",
         credentials: "include" as const,
       }),

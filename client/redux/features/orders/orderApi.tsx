@@ -3,7 +3,7 @@ export const orderApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getAllOrders: builder.query({
       query: (type) => ({
-        url: "get-all-orders",
+        url: "/api/orders/get-all-orders",
         method: "GET",
         credentials: "include" as const,
       }),
@@ -11,7 +11,7 @@ export const orderApi = apiSlice.injectEndpoints({
 
     getStripePublishAbleKey: builder.query({
       query: () => ({
-        url: "payment/stripePublishAbleKey",
+        url: "/api/v1/payment/stripePublishAbleKey",
         method: "GET",
         credentials: "include" as const,
       }),
@@ -19,7 +19,7 @@ export const orderApi = apiSlice.injectEndpoints({
 
     createPaymentIntent: builder.mutation({
       query: ({ amount, courseId, couponCode }) => ({
-        url: "payment/process",
+        url: "/api/v1/payment/process",
         method: "POST",
         body: { amount, courseId, couponCode },
         credentials: "include" as const,
@@ -28,7 +28,7 @@ export const orderApi = apiSlice.injectEndpoints({
 
     createOrder: builder.mutation({
       query: ({ courseId, payment_info, userId, couponCode }) => ({
-        url: "create-order",
+        url: "/api/orders/create-order",
         method: "POST",
         body: { courseId, payment_info, userId, couponCode },
         credentials: "include" as const,
@@ -38,7 +38,7 @@ export const orderApi = apiSlice.injectEndpoints({
     // Free course enrollment
     enrollFreeCourse: builder.mutation({
       query: ({ courseId }) => ({
-        url: "payment/enroll-free",
+        url: "/api/v1/payment/enroll-free",
         method: "POST",
         body: { courseId },
         credentials: "include" as const,
@@ -48,7 +48,7 @@ export const orderApi = apiSlice.injectEndpoints({
     // Apply coupon code
     applyCoupon: builder.mutation({
       query: ({ code, courseId }) => ({
-        url: "apply-coupon",
+        url: "/api/v1/apply-coupon",
         method: "POST",
         body: { code, courseId },
         credentials: "include" as const,
@@ -58,7 +58,7 @@ export const orderApi = apiSlice.injectEndpoints({
     // Get order receipt
     getOrderReceipt: builder.query({
       query: (orderId) => ({
-        url: `payment/receipt/${orderId}`,
+        url: `/api/v1/payment/receipt/${orderId}`,
         method: "GET",
         credentials: "include" as const,
       }),

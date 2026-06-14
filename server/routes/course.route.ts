@@ -53,7 +53,7 @@ courseRouter.put(
 );
 
 courseRouter.put(
-  '/add-review',
+  '/add-review/:id',
   isAuthenticated,
   authorizeRoles('admin'),
   addReview
