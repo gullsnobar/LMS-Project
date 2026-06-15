@@ -55,6 +55,9 @@ app.use("/api/analytics", analyticsRouter);
 app.use("/api/layout", layoutRouter);
 app.use("/api/v1", paymentRouter);
 app.use("/api/v1", couponRouter);
+// Also mount userRouter at /api/v1 so client calls like
+// /api/v1/user-dashboard-stats and /api/v1/user-orders resolve correctly
+app.use("/api/v1", userRouter);
 // Also mount under /api/user for the client's baseURL
 app.use("/api/user", paymentRouter);
 app.use("/api/user", couponRouter);

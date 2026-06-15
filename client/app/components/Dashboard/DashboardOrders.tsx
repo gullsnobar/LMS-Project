@@ -42,7 +42,7 @@ const DashboardOrders: FC<Props> = ({ user }) => {
   const totalSpent = useMemo(
     () =>
       orders.reduce(
-        (sum: number, o: any) => sum + (o.course?.price || 0),
+        (sum: number, o: any) => sum + (o.amount || o.course?.price || 0),
         0
       ),
     [orders]
@@ -123,7 +123,7 @@ const DashboardOrders: FC<Props> = ({ user }) => {
               <HiOutlineCurrencyDollar size={20} className="text-white" />
             ),
             label: "Total Spent",
-            value: `$${totalSpent}`,
+            value: `$${totalSpent.toFixed(2)}`,
             gradient: "from-violet-500 to-purple-700",
             glow: "shadow-violet-500/25",
           },
@@ -249,7 +249,7 @@ const DashboardOrders: FC<Props> = ({ user }) => {
                     {/* Amount */}
                     <div className="md:col-span-2 flex items-center">
                       <span className="text-sm font-bold text-gray-900 dark:text-white">
-                        ${order.course?.price || 0}
+                        ${(order.amount ?? order.course?.price ?? 0).toFixed(2)}
                       </span>
                     </div>
 
@@ -336,7 +336,7 @@ const DashboardOrders: FC<Props> = ({ user }) => {
                                   Amount
                                 </p>
                                 <p className="text-xs font-bold text-gray-900 dark:text-white">
-                                  ${order.course?.price || 0} USD
+                                  ${(order.amount ?? order.course?.price ?? 0).toFixed(2)} USD
                                 </p>
                               </div>
                               <div>

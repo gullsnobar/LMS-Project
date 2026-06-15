@@ -286,8 +286,27 @@ export const getUserInfo = catchAsyncErrors(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user?._id;
-      // getUserById(userId, res); // Function not defined, placeholder response below
-      res.status(200).json({ success: true, message: "User info endpoint placeholder", userId });
+      if (!userId) {
+        return next(new ErrorHandler("Unauthorized", 401));
+      }
+
+      // Try Redis cache first
+      const cached = await redis.get(userId);
+      if (cached) {
+        const user = JSON.parse(cached);
+        return res.status(200).json({ success: true, user });
+      }
+
+      // Fallback: fetch from DB and cache
+      const user = await userModel.findById(userId);
+      if (!user) {
+        return next(new ErrorHandler("User not found", 404));
+      }
+
+      // Cache for 7 days
+      await redis.set(userId, JSON.stringify(user), "EX", 7 * 24 * 60 * 60);
+
+      return res.status(200).json({ success: true, user });
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       return next(new ErrorHandler(message, 400));
