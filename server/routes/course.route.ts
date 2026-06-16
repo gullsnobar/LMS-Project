@@ -1,8 +1,9 @@
 import express from 'express';
-import { uploadCourse, editCourse, getSingleCourse, getAllCourses, getCourseByUser, addQuestion, addAnswer, addReview, addReplyToReview } from '../controllers/course.controllers';
+import { uploadCourse, editCourse, getSingleCourse, getAllCourses, getCourseByUser, addQuestion, addAnswer, addReview, addReplyToReview, getAllCoursesAdmin } from '../controllers/course.controllers';
 import { authorizeRoles, isAuthenticated } from '../middleware/auth';
 const courseRouter = express.Router();
 
+// ── Admin: create / edit ──────────────────────────────────────────────────
 courseRouter.post(
   '/create-course',
   isAuthenticated,
@@ -17,61 +18,33 @@ courseRouter.put(
   editCourse
 );
 
-courseRouter.get(
-  '/get-course/:id',
-  isAuthenticated,
-  authorizeRoles('admin'),
-  getSingleCourse
-);
+// ── Public: browse all courses (no auth required) ─────────────────────────
+courseRouter.get('/get-courses', getAllCourses);
 
-courseRouter.get(
-  '/get-courses',
-  isAuthenticated,
-  authorizeRoles('admin'),
-  getAllCourses
-);
+// ── Public: single course preview (no auth required) ─────────────────────
+courseRouter.get('/get-course/:id', getSingleCourse);
 
+// ── Authenticated: full course content (purchased users) ─────────────────
 courseRouter.get(
   '/get-course-content/:id',
   isAuthenticated,
-  authorizeRoles('admin'),
   getCourseByUser
 );
 
-courseRouter.put(
-  '/add-question',
-  isAuthenticated,
-  authorizeRoles('admin'),
-  addQuestion
-);
+// ── Authenticated: questions & answers ───────────────────────────────────
+courseRouter.put('/add-question', isAuthenticated, addQuestion);
+courseRouter.put('/add-answer', isAuthenticated, addAnswer);
 
-courseRouter.put(
-  '/add-answer',
-  isAuthenticated,
-  authorizeRoles('admin'),
-  addAnswer
-);
+// ── Authenticated: reviews ────────────────────────────────────────────────
+courseRouter.put('/add-review/:id', isAuthenticated, addReview);
+courseRouter.put('/add-reply', isAuthenticated, addReplyToReview);
 
-courseRouter.put(
-  '/add-review/:id',
-  isAuthenticated,
-  authorizeRoles('admin'),
-  addReview
-);
-
-courseRouter.put(
-  '/add-reply',
-  isAuthenticated,
-  authorizeRoles('admin'),
-  addReplyToReview
-);
-
+// ── Admin: all courses with full data ────────────────────────────────────
 courseRouter.get(
-  '/get-courses',
+  '/get-admin-courses',
   isAuthenticated,
   authorizeRoles('admin'),
-  getAllCourses
+  getAllCoursesAdmin
 );
-
 
 export default courseRouter;

@@ -203,7 +203,11 @@ export const getLayoutByType = CatchAsyncError(
             const layout = await LayoutModel.findOne({ type });
 
             if (!layout) {
-                return next(new ErrorHandler(`${type} layout not found`, 404));
+                // Return empty success instead of 404 — frontend handles the empty state
+                return res.status(200).json({
+                    success: true,
+                    layout: null,
+                });
             }
 
             res.status(200).json({

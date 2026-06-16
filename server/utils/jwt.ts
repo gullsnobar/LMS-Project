@@ -20,9 +20,10 @@ export const sendToken = (
   const accessToken = user.SignAccessToken();
   const refreshToken = user.SignRefreshToken();
 
-  // store minimal session data in redis using refresh token as key
+  // store session data in redis using user._id as key
+  // (isAuthenticated middleware looks up redis.get(decoded.id) where decoded.id = user._id)
   redis.set(
-    refreshToken,
+    user._id.toString(),
     JSON.stringify({
       _id: user._id,
       name: user.name,
@@ -30,14 +31,15 @@ export const sendToken = (
       role: user.role,
       isVerified: user.isVerified,
       avatar: user.avatar,
-    })
+      courses: (user as any).courses || [],
+    }),
+    'EX',
+    7 * 24 * 60 * 60  // 7 days TTL
   );
 
 
   const accessTokenExpire =
-    parseInt(process.env.ACCESS_TOKEN_EXPIRE || "15", 10) * 60
-    60 *
-    1000; // 15 minutes
+    parseInt(process.env.ACCESS_TOKEN_EXPIRE || "15", 10) * 60 * 1000; // 15 minutes in ms
 
   const refreshTokenExpire =
     parseInt(process.env.REFRESH_TOKEN_EXPIRE || "7", 10) *
@@ -63,7 +65,7 @@ export const sendToken = (
   };
 
   res.cookie("accessToken", accessToken, accessTokenOptions);
-  res.cookie("refreshToken", refreshToken, refreshTokenOptions);
+  res.cookie("refresh_token", refreshToken, refreshTokenOptions);
 
   res.status(statusCode).json({
     success: true,

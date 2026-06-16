@@ -55,20 +55,47 @@ export const registerationUser = catchAsyncErrors(
     const activationToken = createActivasionToken(user);
     const { activationCode } = activationToken;
 
-    await sendMail({
-      email: user.email,
-      subject: "Activate your account",
-      template: "activationEmail.ejs",
-      data: {
-        name: user.name,
-        activationCode,
-      },
-    });
+    // Check if SMTP is configured
+    const smtpConfigured =
+      process.env.SMTP_HOST &&
+      process.env.SMTP_USER &&
+      process.env.SMTP_PASSWORD;
 
-    res.status(201).json({
+    if (smtpConfigured) {
+      try {
+        await sendMail({
+          email: user.email,
+          subject: "Activate your account",
+          template: "activationEmail.ejs",
+          data: { name: user.name, activationCode },
+        });
+      } catch (error: any) {
+        console.error("Email sending failed:", error.message);
+        return next(
+          new ErrorHandler(
+            "Failed to send activation email. Please check SMTP settings.",
+            500
+          )
+        );
+      }
+
+      return res.status(201).json({
+        success: true,
+        message: `Activation email sent to ${user.email}`,
+        activationToken: activationToken.token,
+      });
+    }
+
+    // SMTP not configured — dev mode: return code directly so you can still test
+    console.warn(
+      `[DEV] SMTP not configured. Activation code for ${user.email}: ${activationCode}`
+    );
+    return res.status(201).json({
       success: true,
-      message: "Activation email sent successfully",
-      activationToken,
+      message:
+        "[DEV MODE] SMTP not configured. Activation code returned in response.",
+      activationToken: activationToken.token,
+      activationCode, // only included when SMTP is not set up
     });
   }
 );
@@ -178,12 +205,6 @@ export const loginUser = catchAsyncErrors(
     }
 
     sendToken(user, 200, res);
-
-    res.status(200).json({
-      success: true,
-      message: "Login successful",
-      user,
-    });
   }
 );
 
@@ -192,17 +213,14 @@ export const loginUser = catchAsyncErrors(
 // ===============================
 export const logoutUser = catchAsyncErrors(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { refreshToken } = req.cookies;
-
-    if (!refreshToken) {
-      return next(new ErrorHandler("No refresh token provided", 400));
+    // Delete session from Redis using the user's _id (our session key)
+    const userId = req.user?._id;
+    if (userId) {
+      await redis.del(userId.toString());
     }
 
-    // Remove the refresh token from Redis or database
-    await redis.del(refreshToken);
-
     res.clearCookie("accessToken");
-    res.clearCookie("refreshToken");
+    res.clearCookie("refresh_token");
 
     res.status(200).json({
       success: true,
@@ -266,7 +284,7 @@ export const updateAccessToken = catchAsyncErrors(
 
       // Set cookies with correct names and options
       res.cookie("accessToken", accessToken, accessTokenOptions);
-      res.cookie("refreshToken", refresh_token, refreshTokenOptions);
+      res.cookie("refresh_token", refresh_token, refreshTokenOptions);
 
       res.status(200).json({
         success: true,

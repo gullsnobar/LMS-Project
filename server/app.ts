@@ -24,9 +24,24 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// ── CORS ──────────────────────────────────────────────────────────
+// In development: reflect any request origin (works with credentials).
+// In production: restrict to ORIGIN env var (comma-separated list).
+const isProd = process.env.NODE_ENV === "production";
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+  ...(process.env.ORIGIN || "").split(",").map((o) => o.trim()).filter(Boolean),
+];
+
 app.use(
   cors({
-    origin: process.env.ORIGIN || "http://localhost:3000",
+    origin: isProd
+      ? (origin, cb) => {
+          if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+          cb(new Error(`CORS: origin ${origin} not allowed`));
+        }
+      : true,   // dev: echo back whatever origin the browser sends
     credentials: true,
   })
 );
@@ -66,8 +81,12 @@ app.use("/api/user", couponRouter);
    Error Handling Middleware
 ======================= */
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-  console.error("Error:", err);
-  res.status(err.status || 500).json({
+  const status = err.status || err.statusCode || 500;
+  // Only log actual server errors — suppress expected auth/session 400-401 noise
+  if (status >= 500) {
+    console.error("Server Error:", err.message);
+  }
+  res.status(status).json({
     success: false,
     message: err.message || "Internal Server Error",
   });

@@ -33,6 +33,9 @@ export const uploadCourse = catchAsyncErrors(
     // Create course in DB
     const course = await CourseModel.create(data);
 
+    // Invalidate courses list cache
+    await redis.del("all_courses");
+
     res.status(201).json({
       success: true,
       course,
@@ -79,6 +82,9 @@ export const editCourse = catchAsyncErrors(
       runValidators: true,
     });
 
+    // Invalidate courses list cache
+    await redis.del("all_courses");
+
     res.status(200).json({
       success: true,
       course: updatedCourse,
@@ -110,28 +116,33 @@ export const getSingleCourse = catchAsyncErrors(async (req: Request, res: Respon
 
 export const getAllCourses = catchAsyncErrors(async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const courseId = req.params.id;
-    const isCatchExist = await redis.get(courseId);
-    if (isCatchExist) {
+    // Use a fixed cache key — req.params.id is undefined on /get-courses
+    const cacheKey = "all_courses";
+    const cached = await redis.get(cacheKey);
+    if (cached) {
       return res.status(200).json({
         success: true,
-        course: JSON.parse(isCatchExist)
-      })
+        courses: JSON.parse(cached),
+      });
     }
-    const courses = await CourseModel.find().select("-courseData.videoUrl -courseData.suggestions -courseData.questions -courseData.links")
-    if (!courses) {
-      return next(new ErrorHandler("Courses not found", 404))
-    }
+
+    const courses = await CourseModel.find().select(
+      "-courseData.videoUrl -courseData.suggestions -courseData.questions -courseData.links"
+    );
+
+    // Cache for 10 minutes
+    await redis.set(cacheKey, JSON.stringify(courses), "EX", 10 * 60);
+
     res.status(200).json({
       success: true,
-      courses
-    })
+      courses,
+    });
 
   } catch (error: any) {
-    return next(new ErrorHandler(error.message, 500))
+    return next(new ErrorHandler(error.message, 500));
   }
-
 })
+
 
 
 

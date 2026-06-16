@@ -3,17 +3,30 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const redis = process.env.REDIS_URL ? new Redis(process.env.REDIS_URL) : null as any;
+// ---------------------------------------------------------------------------
+// Create a safe Redis wrapper that no-ops gracefully when REDIS_URL is absent.
+// This prevents null-pointer crashes in controllers that call redis.get / set.
+// ---------------------------------------------------------------------------
 
-if (redis) {
-    redis.on('connect', () => {
-        console.log('✅ Redis connected');
-    });
+const createRedisClient = () => {
+  if (process.env.REDIS_URL) {
+    const client = new Redis(process.env.REDIS_URL);
 
-    redis.on('error', (err: any) => {
-        console.error('❌ Redis error:', err.message);
-    });
-}
+    client.on('connect', () => console.log('✅ Redis connected'));
+    client.on('error', (err: any) => console.error('❌ Redis error:', err.message));
 
-// Export redis instance as a named export
-export { redis };
+    return client;
+  }
+
+  // No REDIS_URL — return a no-op stub so controllers don't crash
+  console.warn('⚠️  REDIS_URL not set. Caching disabled — running without Redis.');
+
+  return {
+    get: async (_key: string) => null,
+    set: async (..._args: any[]) => 'OK',
+    del: async (..._args: any[]) => 1,
+    on: () => {},
+  } as any;
+};
+
+export const redis = createRedisClient();

@@ -5,20 +5,21 @@ export const apiSlice = createApi({
     reducerPath: "api",
     baseQuery: fetchBaseQuery({
         baseUrl: process.env.NEXT_PUBLIC_SERVER_URI || "http://localhost:5000",
+        credentials: "include",   // always send cookies with every request
     }),
     endpoints: (builder) => ({
         refreshToken: builder.query<any, void>({
             query: () => ({
                 url: "/api/users/refresh-token",
-                method: "POST",
-                withCredentials: true,
+                method: "GET",
+                credentials: "include" as const,
             }),
         }),
         loadUser: builder.query<any, void>({
             query: () => ({
                 url: "/api/users/me",
                 method: "GET",
-                withCredentials: true,
+                credentials: "include" as const,
             }),
 
             async onQueryStarted(arg, { dispatch, queryFulfilled }) {
@@ -26,7 +27,7 @@ export const apiSlice = createApi({
                     const { data } = await queryFulfilled;
                     dispatch(userLoggedIn(data));
                 } catch (error) {
-                    console.log(error);
+                    // Silently ignore — user is not logged in
                 }
             },
         }),
