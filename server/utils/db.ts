@@ -1,8 +1,7 @@
 import mongoose from "mongoose";
 import dns from "dns";
 
-// Set DNS servers to Google's public DNS to help with SRV record resolution
-dns.setServers(['8.8.8.8', '8.8.4.4', '1.1.1.1']);
+// Removed custom DNS servers to use system default DNS
 
 const connectDB = async (): Promise<void> => {
   try {
@@ -27,11 +26,11 @@ const connectDB = async (): Promise<void> => {
 
     // Connection event listeners
     mongoose.connection.on('error', (err) => {
-      console.error('❌ MongoDB error:', err.message);
+      console.error('MongoDB error:', err.message);
     });
 
     mongoose.connection.on('disconnected', () => {
-      console.log('⚠️  MongoDB disconnected');
+      console.log(' MongoDB disconnected');
     });
 
   } catch (error) {
