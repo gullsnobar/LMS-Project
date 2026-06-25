@@ -240,18 +240,40 @@ export const updateAccessToken = catchAsyncErrors(
         return next(new ErrorHandler("No refresh token provided", 400));
       }
 
-      const decoded = jwt.verify(
-        refresh_token,
-        process.env.REFRESH_TOKEN as string
-      ) as JwtPayload;
-
-      const userData = await redis.get(decoded.id);
-
-      if (!userData) {
-        return next(new ErrorHandler("Session expired. Please login again", 401));
+      let decoded: JwtPayload;
+      try {
+        decoded = jwt.verify(
+          refresh_token,
+          process.env.REFRESH_TOKEN as string
+        ) as JwtPayload;
+      } catch {
+        return next(new ErrorHandler("Invalid or expired refresh token. Please login again", 401));
       }
 
-      const user = JSON.parse(userData);
+      // Try Redis cache first
+      const cached = await redis.get(decoded.id);
+      let user: any;
+
+      if (cached) {
+        user = JSON.parse(cached);
+      } else {
+        // DB fallback — works when Redis is unavailable or session has expired from cache
+        const dbUser = await userModel.findById(decoded.id);
+        if (!dbUser) {
+          return next(new ErrorHandler("User not found. Please login again", 401));
+        }
+        user = {
+          _id: dbUser._id,
+          name: dbUser.name,
+          email: dbUser.email,
+          role: dbUser.role,
+          isVerified: dbUser.isVerified,
+          avatar: dbUser.avatar,
+          courses: (dbUser as any).courses || [],
+        };
+        // Re-populate Redis cache for next time
+        await redis.set(decoded.id, JSON.stringify(user), 'EX', 7 * 24 * 60 * 60);
+      }
 
       const accessToken = jwt.sign(
         { id: user._id },
@@ -259,12 +281,10 @@ export const updateAccessToken = catchAsyncErrors(
         { expiresIn: "15m" }
       );
 
-
-      // Define token options (should match those in utils/jwt.ts)
       const accessTokenExpire =
-        parseInt(process.env.ACCESS_TOKEN_EXPIRE || "15", 10) * 60 * 1000; // 15 minutes
+        parseInt(process.env.ACCESS_TOKEN_EXPIRE || "15", 10) * 60 * 1000;
       const refreshTokenExpire =
-        parseInt(process.env.REFRESH_TOKEN_EXPIRE || "7", 10) * 24 * 60 * 60 * 1000; // 7 days
+        parseInt(process.env.REFRESH_TOKEN_EXPIRE || "7", 10) * 24 * 60 * 60 * 1000;
 
       const accessTokenOptions: import('express').CookieOptions = {
         expires: new Date(Date.now() + accessTokenExpire),
@@ -282,7 +302,6 @@ export const updateAccessToken = catchAsyncErrors(
         secure: process.env.NODE_ENV === "production",
       };
 
-      // Set cookies with correct names and options
       res.cookie("accessToken", accessToken, accessTokenOptions);
       res.cookie("refresh_token", refresh_token, refreshTokenOptions);
 
@@ -290,10 +309,11 @@ export const updateAccessToken = catchAsyncErrors(
         success: true,
         message: "Tokens refreshed successfully",
         accessToken,
+        user,
       });
 
     } catch (error) {
-      return next(new ErrorHandler("Invalid refresh token. Please login again", 401));
+      return next(new ErrorHandler("Token refresh failed. Please login again", 401));
     }
   }
 );
