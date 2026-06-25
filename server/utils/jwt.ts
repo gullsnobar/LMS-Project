@@ -70,12 +70,15 @@ export const sendToken = (
   res.status(statusCode).json({
     success: true,
     message: "Tokens sent successfully",
+    accessToken,
     user: {
+      _id: user._id,
       name: user.name,
       email: user.email,
       role: user.role,
       isVerified: user.isVerified,
       avatar: user.avatar,
+      courses: (user as any).courses || [],
     },
   });
 };

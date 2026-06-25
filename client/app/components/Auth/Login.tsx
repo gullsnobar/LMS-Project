@@ -50,7 +50,7 @@ const Login: FC<Props> = ({ setRoute, setOpen, isPage = false }) => {
         if (isSuccess) {
             toast.success("Login Successfully!");
             if (isPage) {
-                router.push("/");
+                router.push("/dashboard");
             } else if (setOpen) {
                 setOpen(false);
             }

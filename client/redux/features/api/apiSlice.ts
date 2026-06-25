@@ -14,6 +14,19 @@ export const apiSlice = createApi({
                 method: "GET",
                 credentials: "include" as const,
             }),
+            // When refresh succeeds the server sets a new accessToken cookie
+            // and returns { success, message, accessToken }
+            async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+                try {
+                    const { data } = await queryFulfilled;
+                    if (data?.accessToken) {
+                        // We don't have a user object here — loadUser will supply it
+                        dispatch(userLoggedIn({ accessToken: data.accessToken, user: null }));
+                    }
+                } catch {
+                    // Refresh failed — user is not logged in, ignore silently
+                }
+            },
         }),
         loadUser: builder.query<any, void>({
             query: () => ({
@@ -21,12 +34,19 @@ export const apiSlice = createApi({
                 method: "GET",
                 credentials: "include" as const,
             }),
-
-            async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+            // /api/users/me returns { success, user }
+            async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
                 try {
                     const { data } = await queryFulfilled;
-                    dispatch(userLoggedIn(data));
-                } catch (error) {
+                    if (data?.user) {
+                        dispatch(
+                            userLoggedIn({
+                                accessToken: data.accessToken || "",
+                                user: data.user,
+                            })
+                        );
+                    }
+                } catch {
                     // Silently ignore — user is not logged in
                 }
             },
@@ -35,3 +55,4 @@ export const apiSlice = createApi({
 });
 
 export const { useRefreshTokenQuery, useLoadUserQuery } = apiSlice;
+

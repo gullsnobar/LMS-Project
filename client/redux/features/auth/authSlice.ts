@@ -2,12 +2,12 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface AuthState {
     token: string;
-    user: string;
+    user: any;
 }
 
 const initialState: AuthState = {
     token: "",
-    user: "",
+    user: null,
 };
 
 const authSlice = createSlice({
@@ -19,10 +19,13 @@ const authSlice = createSlice({
         },
         userLoggedIn: (
             state,
-            action: PayloadAction<{ accessToken: string; user: string }>
+            action: PayloadAction<{ accessToken: string; user: any }>
         ) => {
             state.token = action.payload.accessToken;
-            state.user = action.payload.user;
+            // Only overwrite user if a real user object was provided
+            if (action.payload.user !== null && action.payload.user !== undefined) {
+                state.user = action.payload.user;
+            }
         },
         userLoggedOut: (state) => {
             state.token = "";
