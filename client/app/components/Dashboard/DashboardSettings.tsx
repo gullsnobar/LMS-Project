@@ -246,16 +246,15 @@ const DashboardSettings: FC<Props> = ({ user }) => {
                     <label className="block text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
                       Full Name
                     </label>
-                    <div className="relative">
-                      <HiOutlineUser
-                        size={16}
-                        className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
-                      />
+                    <div className="flex items-center rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 transition-all duration-200 focus-within:ring-2 focus-within:ring-blue-500/30 focus-within:border-blue-500">
+                      <span className="flex-shrink-0 flex items-center pl-3.5 text-gray-400">
+                        <HiOutlineUser size={16} />
+                      </span>
                       <input
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all"
+                        className="flex-1 min-w-0 bg-transparent py-2.5 px-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none"
                         placeholder="Your full name"
                       />
                     </div>
@@ -264,16 +263,15 @@ const DashboardSettings: FC<Props> = ({ user }) => {
                     <label className="block text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
                       Email Address
                     </label>
-                    <div className="relative">
-                      <HiOutlineEnvelope
-                        size={16}
-                        className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
-                      />
+                    <div className="flex items-center rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 transition-all duration-200 focus-within:ring-2 focus-within:ring-blue-500/30 focus-within:border-blue-500">
+                      <span className="flex-shrink-0 flex items-center pl-3.5 text-gray-400">
+                        <HiOutlineEnvelope size={16} />
+                      </span>
                       <input
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all"
+                        className="flex-1 min-w-0 bg-transparent py-2.5 px-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none"
                         placeholder="your@email.com"
                       />
                     </div>
@@ -322,23 +320,22 @@ const DashboardSettings: FC<Props> = ({ user }) => {
                       <label className="block text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
                         Current Password
                       </label>
-                      <div className="relative">
-                        <HiOutlineLockClosed
-                          size={16}
-                          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
-                        />
+                      <div className="flex items-center rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 transition-all duration-200 focus-within:ring-2 focus-within:ring-blue-500/30 focus-within:border-blue-500">
+                        <span className="flex-shrink-0 flex items-center pl-3.5 text-gray-400">
+                          <HiOutlineLockClosed size={16} />
+                        </span>
                         <input
                           type={showOld ? "text" : "password"}
                           value={oldPassword}
                           onChange={(e) => setOldPassword(e.target.value)}
-                          className="w-full pl-10 pr-10 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all"
+                          className="flex-1 min-w-0 bg-transparent py-2.5 px-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none"
                           placeholder="Enter current password"
                           required
                         />
                         <button
                           type="button"
                           onClick={() => setShowOld(!showOld)}
-                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                          className="flex-shrink-0 flex items-center pr-3.5 text-gray-400 hover:text-gray-600 transition-colors"
                         >
                           {showOld ? (
                             <HiOutlineEyeSlash size={16} />
@@ -354,16 +351,15 @@ const DashboardSettings: FC<Props> = ({ user }) => {
                       <label className="block text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
                         New Password
                       </label>
-                      <div className="relative">
-                        <HiOutlineLockClosed
-                          size={16}
-                          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
-                        />
+                      <div className="flex items-center rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 transition-all duration-200 focus-within:ring-2 focus-within:ring-blue-500/30 focus-within:border-blue-500">
+                        <span className="flex-shrink-0 flex items-center pl-3.5 text-gray-400">
+                          <HiOutlineLockClosed size={16} />
+                        </span>
                         <input
                           type={showNew ? "text" : "password"}
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
-                          className="w-full pl-10 pr-10 py-2.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all"
+                          className="flex-1 min-w-0 bg-transparent py-2.5 px-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none"
                           placeholder="Enter new password"
                           required
                           minLength={8}
@@ -371,7 +367,7 @@ const DashboardSettings: FC<Props> = ({ user }) => {
                         <button
                           type="button"
                           onClick={() => setShowNew(!showNew)}
-                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                          className="flex-shrink-0 flex items-center pr-3.5 text-gray-400 hover:text-gray-600 transition-colors"
                         >
                           {showNew ? (
                             <HiOutlineEyeSlash size={16} />
@@ -415,24 +411,23 @@ const DashboardSettings: FC<Props> = ({ user }) => {
                       <label className="block text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
                         Confirm New Password
                       </label>
-                      <div className="relative">
-                        <HiOutlineLockClosed
-                          size={16}
-                          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
-                        />
+                      <div className={`flex items-center rounded-xl border bg-gray-50 dark:bg-gray-800/50 transition-all duration-200 ${
+                        confirmPassword && confirmPassword !== newPassword
+                          ? "border-red-400 focus-within:border-red-500"
+                          : confirmPassword && confirmPassword === newPassword
+                          ? "border-emerald-400 focus-within:border-emerald-500"
+                          : "border-gray-200 dark:border-gray-700 focus-within:ring-2 focus-within:ring-blue-500/30 focus-within:border-blue-500"
+                      }`}>
+                        <span className="flex-shrink-0 flex items-center pl-3.5 text-gray-400">
+                          <HiOutlineLockClosed size={16} />
+                        </span>
                         <input
                           type={showConfirm ? "text" : "password"}
                           value={confirmPassword}
                           onChange={(e) =>
                             setConfirmPassword(e.target.value)
                           }
-                          className={`w-full pl-10 pr-10 py-2.5 bg-gray-50 dark:bg-gray-800/50 border rounded-xl text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all ${
-                            confirmPassword && confirmPassword !== newPassword
-                              ? "border-red-400 focus:border-red-500"
-                              : confirmPassword && confirmPassword === newPassword
-                              ? "border-emerald-400 focus:border-emerald-500"
-                              : "border-gray-200 dark:border-gray-700 focus:border-blue-500"
-                          }`}
+                          className="flex-1 min-w-0 bg-transparent py-2.5 px-3 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none"
                           placeholder="Confirm new password"
                           required
                           minLength={8}
@@ -440,7 +435,7 @@ const DashboardSettings: FC<Props> = ({ user }) => {
                         <button
                           type="button"
                           onClick={() => setShowConfirm(!showConfirm)}
-                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                          className="flex-shrink-0 flex items-center pr-3.5 text-gray-400 hover:text-gray-600 transition-colors"
                         >
                           {showConfirm ? (
                             <HiOutlineEyeSlash size={16} />

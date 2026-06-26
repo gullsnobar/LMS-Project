@@ -12,7 +12,7 @@ import {
   HiOutlineChevronRight,
   HiOutlineClipboardDocumentList,
   HiOutlineBookOpen,
-  HiOutlineSparkles,
+  HiOutlineQuestionMarkCircle,
   HiOutlineRocketLaunch,
   HiOutlineCalendarDays,
   HiOutlineFire,
@@ -37,14 +37,10 @@ const StatCard: FC<{
   delay: number;
 }> = ({ icon, label, value, sub, gradient, glow, delay }) => (
   <div
-    className="group relative overflow-hidden bg-white dark:bg-[#111827] rounded-2xl border border-gray-100 dark:border-gray-800/80 p-5 shadow-sm hover:shadow-2xl transition-all duration-500"
+    className="group relative overflow-hidden bg-white dark:bg-[#111827] rounded-2xl border border-gray-100 dark:border-gray-800/80 p-5 shadow-sm hover:shadow-lg transition-all duration-300"
     style={{ animationDelay: `${delay}ms` }}
   >
-    {/* animated background orb */}
-    <div
-      className={`absolute -top-8 -right-8 w-28 h-28 ${gradient} rounded-full blur-2xl opacity-20 group-hover:opacity-40 transition-opacity duration-700`}
-    />
-    <div className="relative z-10 flex items-start justify-between">
+    <div className="flex items-start justify-between">
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-gray-400 dark:text-gray-500 mb-1.5">
           {label}
@@ -62,7 +58,7 @@ const StatCard: FC<{
         )}
       </div>
       <div
-        className={`w-12 h-12 rounded-xl ${gradient} flex items-center justify-center shadow-lg ${glow}`}
+        className={`w-11 h-11 rounded-xl ${gradient} flex items-center justify-center shadow-md ${glow}`}
       >
         {icon}
       </div>
@@ -208,13 +204,8 @@ const DashboardOverview: FC<Props> = ({ user, setActiveTab }) => {
   return (
     <div className="space-y-6">
       {/* ───── Welcome Banner ───── */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#667eea] via-[#764ba2] to-[#f5576c] p-6 md:p-8 text-white shadow-2xl">
-        {/* decorative blobs */}
-        <div className="absolute -top-16 -right-16 w-56 h-56 bg-white/10 rounded-full blur-2xl" />
-        <div className="absolute -bottom-12 -left-12 w-40 h-40 bg-white/10 rounded-full blur-xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
-
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#667eea] via-[#764ba2] to-[#f5576c] p-6 md:p-8 text-white shadow-xl">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div>
             <p className="text-white/70 text-sm font-medium tracking-wide">
               {greeting},
@@ -432,7 +423,7 @@ const DashboardOverview: FC<Props> = ({ user, setActiveTab }) => {
               ))
             ) : (
               <div className="text-center py-6">
-                <HiOutlineSparkles
+                <HiOutlineClock
                   size={32}
                   className="mx-auto text-gray-300 dark:text-gray-700 mb-2"
                 />
@@ -547,7 +538,7 @@ const DashboardOverview: FC<Props> = ({ user, setActiveTab }) => {
           <QuickAction
             href="/faq"
             icon={
-              <HiOutlineSparkles
+              <HiOutlineQuestionMarkCircle
                 size={24}
                 className="text-emerald-600 dark:text-emerald-400"
               />
