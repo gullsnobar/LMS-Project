@@ -13,12 +13,12 @@ const testConnection = async () => {
             serverSelectionTimeoutMS: 10000,
             family: 4,
         });
-        console.log("✅ MongoDB connection successful!");
+        console.log("MongoDB connection successful!");
         await mongoose.disconnect();
         console.log("Disconnected from MongoDB");
         process.exit(0);
     } catch (error) {
-        console.error("❌ MongoDB connection failed:");
+        console.error("MongoDB connection failed:");
         console.error(error);
         process.exit(1);
     }

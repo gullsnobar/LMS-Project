@@ -18,14 +18,14 @@ const createRedisClient = () => {
       lazyConnect: false,
     });
 
-    client.on('connect', () => console.log('✅ Redis connected'));
-    client.on('error', (err: any) => console.error('⚠️  Redis error (non-fatal):', err.message));
+    client.on('connect', () => console.log('Redis connected'));
+    client.on('error', (err: any) => console.error('Redis error (non-fatal):', err.message));
 
     return client;
   }
 
   // No Redis URL — return a no-op stub so controllers fall back to DB
-  console.warn('⚠️  REDIS_URL not set — session caching disabled. DB fallback active.');
+  console.warn('REDIS_URL not set — session caching disabled. DB fallback active.');
 
   return {
     get: async (_key: string) => null,
