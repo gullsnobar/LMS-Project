@@ -8,7 +8,7 @@ import Link from "next/link";
 import { FiEdit2 } from "react-icons/fi";
 import {
     useDeleteCourseMutation,
-    useGetAllCourseQuery,
+    useGetAdminAllCoursesQuery,
 } from "../../../../redux/features/courses/courseApi";
 import Loader from "../../../components/Loader/Loader";
 import { format } from "timeago.js";
@@ -20,7 +20,7 @@ const AllCourses = () => {
     const { theme } = useTheme();
     const [open, setOpen] = useState(false);
     const [courseId, setCourseId] = useState("");
-    const { isLoading, data, refetch } = useGetAllCourseQuery(
+    const { isLoading, data, refetch } = useGetAdminAllCoursesQuery(
         {},
         { refetchOnMountOrArgChange: true }
     );

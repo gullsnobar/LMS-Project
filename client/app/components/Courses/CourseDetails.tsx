@@ -86,6 +86,15 @@ const CourseDetails: FC<Props> = ({
   useEffect(() => {
     if (freeEnrollData?.success) {
       toast.success("Successfully enrolled in the course!");
+      // Emit notification
+      const socket = require("socket.io-client")(process.env.NEXT_PUBLIC_SOCKET_URI || "", { transports: ["websocket"] });
+      socket.emit("notification", {
+        title: "New Enrollment",
+        message: `A user has enrolled in ${data?.name || "a free course"}`,
+        userId: user?._id,
+      });
+      setTimeout(() => socket.disconnect(), 1000);
+      
       // Update Redux state
       if (user && data?._id) {
         const existingCourses = Array.isArray(user.courses) ? user.courses : [];
@@ -527,7 +536,7 @@ const CourseDetails: FC<Props> = ({
 
               {/* Stripe Payment Form */}
               <div className="p-5">
-                {stripePromise && clientSecret && (
+                {stripePromise && clientSecret ? (
                   <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: "stripe", variables: { colorPrimary: "#667eea", borderRadius: "12px" } } }}>
                     <CheckOutForm
                       setOpen={setOpen}
@@ -537,6 +546,11 @@ const CourseDetails: FC<Props> = ({
                       couponCode={appliedCoupon?.coupon?.code}
                     />
                   </Elements>
+                ) : data.price > 0 && !isPurchased && (
+                  <div className="text-center py-4">
+                    <p className="text-sm text-red-500 font-semibold">Payment system is currently unavailable.</p>
+                    <p className="text-xs text-gray-500 mt-1">Please contact support or try again later.</p>
+                  </div>
                 )}
               </div>
 

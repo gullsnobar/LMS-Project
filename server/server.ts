@@ -8,6 +8,9 @@ import { v2 as cloudinary } from "cloudinary";
 import { app } from "./app";
 import connectDB from "./utils/db";
 
+import http from "http";
+import { initSocketServer } from "./socketServer";
+
 const PORT = Number(process.env.PORT) || 5000;
 
 // Ensure MongoDB URI is defined
@@ -22,6 +25,8 @@ cloudinary.config({
   api_key: process.env.CLOUD_API_KEY || "",
   api_secret: process.env.CLOUD_SECRET_KEY || "",
 });
+
+const server = http.createServer(app);
 
 const startServer = async (): Promise<void> => {
   try {
@@ -39,8 +44,10 @@ const startServer = async (): Promise<void> => {
       }
     }
 
+    initSocketServer(server);
+
     // Start Express server
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log(`Server running at http://localhost:${PORT}`);
     });
   } catch (error) {

@@ -102,6 +102,10 @@ const CourseDetailsPage: FC<Props> = ({ id }: Props) => {
     <>
       {isLoading ? (
         <Loader />
+      ) : !data?.course ? (
+        <div className="flex justify-center items-center h-screen">
+          <h1 className="text-2xl font-bold">Course not found</h1>
+        </div>
       ) : (
         <>
           <Heading
@@ -116,25 +120,23 @@ const CourseDetailsPage: FC<Props> = ({ id }: Props) => {
             setOpen={setOpen}
             activeItem={1}
           />
-          {stripePromise && (
-            <CourseDetails
-              setRoute={setRoute}
-              setOpen={setOpen}
-              data={data.course}
-              stripePromise={stripePromise}
-              clientSecret={clientSecret}
-              createPaymentIntentFn={handleCreatePaymentIntent}
-              onApplyCoupon={handleApplyCoupon}
-              onRemoveCoupon={handleRemoveCoupon}
-              appliedCoupon={appliedCoupon}
-              couponError={couponError}
-              couponLoading={couponLoading}
-              onFreeEnroll={handleFreeEnroll}
-              freeEnrollData={freeEnrollData}
-              freeEnrollError={freeEnrollError}
-              freeEnrollLoading={freeEnrollLoading}
-            />
-          )}
+          <CourseDetails
+            setRoute={setRoute}
+            setOpen={setOpen}
+            data={data.course}
+            stripePromise={stripePromise}
+            clientSecret={clientSecret}
+            createPaymentIntentFn={handleCreatePaymentIntent}
+            onApplyCoupon={handleApplyCoupon}
+            onRemoveCoupon={handleRemoveCoupon}
+            appliedCoupon={appliedCoupon}
+            couponError={couponError}
+            couponLoading={couponLoading}
+            onFreeEnroll={handleFreeEnroll}
+            freeEnrollData={freeEnrollData}
+            freeEnrollError={freeEnrollError}
+            freeEnrollLoading={freeEnrollLoading}
+          />
           <Footer />
         </>
       )}
