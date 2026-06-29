@@ -8,6 +8,8 @@ type Props = {
     setBenefits: (benefits: { title: string }[]) => void;
     prequisites: { title: string }[];
     setPrerequisites: (prequisites: { title: string }[]) => void;
+    targetAudience: { title: string }[];
+    setTargetAudience: (targetAudience: { title: string }[]) => void;
     active: number;
     setActive: (active: number) => void;
 };
@@ -19,6 +21,8 @@ const CourseData = ({
     active,
     setActive,
     prequisites,
+    targetAudience,
+    setTargetAudience,
 }: Props) => {
     
     
@@ -48,6 +52,19 @@ const CourseData = ({
         setPrerequisites(updatedPrerequisites);
     };
 
+    // Adds a new empty target audience input field
+    const handleAddTargetAudience = () => {
+        setTargetAudience([...targetAudience, { title: "" }]);
+    };
+
+    // Updates the title of a target audience at a specific index
+    const handleTargetAudienceChange = (index: number, value: any) => {
+        const updatedAudience = targetAudience.map((a, i) =>
+            i === index ? { ...a, title: value } : a
+        );
+        setTargetAudience(updatedAudience);
+    };
+
     
     const prevButton = () => {
         setActive(active - 1);
@@ -57,7 +74,8 @@ const CourseData = ({
     const handleOptions = () => {
         if (
             benefits[benefits.length - 1]?.title !== "" &&
-            prequisites[prequisites.length - 1]?.title !== ""
+            prequisites[prequisites.length - 1]?.title !== "" &&
+            targetAudience[targetAudience.length - 1]?.title !== ""
         ) {
             setActive(active + 1);
         } else {
@@ -111,6 +129,28 @@ const CourseData = ({
                 <AiOutlinePlusCircle
                     style={{ margin: "10px 0px", cursor: "pointer", width: "30px" }}
                     onClick={handleAddPrerequisites}
+                />
+            </div>
+            <div>
+                <label className={`${styles.label} text-[20px]`} htmlFor="email">
+                    Who is the target audience for this course?
+                </label>
+                <br />
+                {targetAudience.map((audience: any, index: number) => (
+                    <input
+                        type="text"
+                        key={index}
+                        name=""
+                        placeholder="Beginners looking to learn the MERN stack..."
+                        required
+                        className={`${styles.input} my-2`}
+                        value={audience.title}
+                        onChange={(e) => handleTargetAudienceChange(index, e.target.value)}
+                    />
+                ))}
+                <AiOutlinePlusCircle
+                    style={{ margin: "10px 0px", cursor: "pointer", width: "30px" }}
+                    onClick={handleAddTargetAudience}
                 />
             </div>
             <div className="w-full flex items-center justify-between">

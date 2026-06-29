@@ -96,7 +96,16 @@ export const editCourse = catchAsyncErrors(
 
 export const getSingleCourse = catchAsyncErrors(async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const course = await CourseModel.findById(req.params.id).select("-courseData.videoUrl -courseData.suggestions -courseData.questions -courseData.links")
+    const courseIdOrSlug = req.params.id;
+    let query: any = {};
+    
+    if (mongoose.Types.ObjectId.isValid(courseIdOrSlug) && /^[0-9a-fA-F]{24}$/.test(courseIdOrSlug)) {
+      query = { _id: courseIdOrSlug };
+    } else {
+      query = { $or: [{ slug: courseIdOrSlug }, { name: { $regex: new RegExp(`^${courseIdOrSlug}$`, 'i') } }] };
+    }
+
+    const course = await CourseModel.findOne(query).select("-courseData.videoUrl -courseData.suggestions -courseData.questions -courseData.links -courseData.videoCipherVideoId -videoCipherVideoId");
     if (!course) {
       return next(new ErrorHandler("Course not found", 404))
     }
@@ -127,7 +136,7 @@ export const getAllCourses = catchAsyncErrors(async (req: Request, res: Response
     }
 
     const courses = await CourseModel.find().select(
-      "-courseData.videoUrl -courseData.suggestions -courseData.questions -courseData.links"
+      "-courseData.videoUrl -courseData.suggestions -courseData.questions -courseData.links -courseData.videoCipherVideoId -videoCipherVideoId"
     );
 
     // Cache for 10 minutes
@@ -149,17 +158,30 @@ export const getAllCourses = catchAsyncErrors(async (req: Request, res: Response
 // get course content ----- with purchasing
 export const getCourseByUser = catchAsyncErrors(async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const userCourseList = req.user?.courses;
-    const courseId = req.params.id;
+    const userCourseList = req.user?.courses || [];
+    const courseIdOrSlug = req.params.id;
 
-    const courseExist = userCourseList?.find((course: any) => course._id === courseId);
-    if (!courseExist) {
-      return next(new ErrorHandler("You are not authorized to access this course", 400))
+    let query: any = {};
+    if (mongoose.Types.ObjectId.isValid(courseIdOrSlug) && /^[0-9a-fA-F]{24}$/.test(courseIdOrSlug)) {
+      query = { _id: courseIdOrSlug };
+    } else {
+      query = { $or: [{ slug: courseIdOrSlug }, { name: { $regex: new RegExp(`^${courseIdOrSlug}$`, 'i') } }] };
     }
-    const course = await CourseModel.findById(courseId)
+
+    const course = await CourseModel.findOne(query);
     if (!course) {
       return next(new ErrorHandler("Course not found", 404))
     }
+
+    const courseExist = userCourseList?.find((c: any) => {
+      const cId = c?.courseId ?? c?._id ?? c;
+      return cId?.toString() === course._id.toString();
+    });
+    
+    if (!courseExist) {
+      return next(new ErrorHandler("You are not authorized to access this course", 400))
+    }
+    
     const courseContent = course.courseData
     res.status(200).json({
       success: true,

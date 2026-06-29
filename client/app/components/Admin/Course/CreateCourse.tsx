@@ -22,11 +22,14 @@ const CreateCourse = () => {
         tags: "",
         level: "",
         demoUrl: "",
+        videoCipherVideoId: "",
+        freePreviewEnabled: false,
         thumbnail: "",
     });
 
     const [benefits, setBenefits] = useState([{ title: "" }]);
     const [prerequisites, setPrerequisites] = useState([{ title: "" }]);
+    const [targetAudience, setTargetAudience] = useState([{ title: "" }]);
     const [courseContentData, setCourseContentData] = useState([
         {
             videoUrl: "",
@@ -72,6 +75,10 @@ const CreateCourse = () => {
         const formattedPrerequisites = prerequisites.map((prerequisite) => ({
             title: prerequisite.title,
         }));
+        //format target audience array
+        const formattedTargetAudience = targetAudience.map((audience) => ({
+            title: audience.title,
+        }));
         //format course content Array
         const formattedCourseContentData = courseContentData.map((content) => ({
             videoUrl: content.videoUrl,
@@ -96,9 +103,12 @@ const CreateCourse = () => {
             thumbnail: courseInfo.thumbnail,
             level: courseInfo.level,
             demoUrl: courseInfo.demoUrl,
+            videoCipherVideoId: courseInfo.videoCipherVideoId,
+            freePreviewEnabled: courseInfo.freePreviewEnabled,
             totalVideos: courseContentData.length,
             benefits: formattedBenefits,
             prerequisites: formattedPrerequisites,
+            targetAudience: formattedTargetAudience,
             courseData: formattedCourseContentData,
         };
         setCourseData(data);
@@ -132,6 +142,8 @@ const CreateCourse = () => {
                         setBenefits={setBenefits}
                         prequisites={prerequisites}
                         setPrerequisites={setPrerequisites}
+                        targetAudience={targetAudience}
+                        setTargetAudience={setTargetAudience}
                         active={active}
                         setActive={setActive}
                     />

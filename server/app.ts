@@ -10,6 +10,7 @@ import analyticsRouter from "./routes/analytics.route";
 import layoutRouter from "./routes/layout.route";
 import paymentRouter, { stripeWebhook } from "./routes/payment.route";
 import couponRouter from "./routes/coupon.route";
+import videoCipherRouter from "./routes/videoCipher.route";
 
 const app: Application = express();
 
@@ -70,6 +71,7 @@ app.use("/api/analytics", analyticsRouter);
 app.use("/api/layout", layoutRouter);
 app.use("/api/v1", paymentRouter);
 app.use("/api/v1", couponRouter);
+app.use("/api/v1", videoCipherRouter);
 // Also mount userRouter at /api/v1 so client calls like
 // /api/v1/user-dashboard-stats and /api/v1/user-orders resolve correctly
 app.use("/api/v1", userRouter);

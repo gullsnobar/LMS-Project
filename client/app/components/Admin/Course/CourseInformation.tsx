@@ -247,6 +247,40 @@ const CourseInformation = ({ courseInfo, setCourseInfo, active, setActive }: Pro
                 </div>
                 <br />
 
+                {/* VideoCipher inputs */}
+                <div className="w-full flex justify-between">
+                    <div className="w-[45%]">
+                        <label className={`${styles.label}`}>VideoCipher Demo ID</label>
+                        <input
+                            type="text"
+                            name=""
+                            value={courseInfo.videoCipherVideoId}
+                            onChange={(e: any) =>
+                                setCourseInfo({ ...courseInfo, videoCipherVideoId: e.target.value })
+                            }
+                            id="videoCipherVideoId"
+                            placeholder="4dcdadac907e4c7ca01a3d574e471c7f"
+                            className={`${styles.input}`}
+                        />
+                    </div>
+                    <div className="w-[50%] flex items-center pt-8">
+                        <input
+                            type="checkbox"
+                            name="freePreviewEnabled"
+                            checked={courseInfo.freePreviewEnabled}
+                            onChange={(e: any) =>
+                                setCourseInfo({ ...courseInfo, freePreviewEnabled: e.target.checked })
+                            }
+                            id="freePreviewEnabled"
+                            className="mr-2 w-5 h-5 cursor-pointer"
+                        />
+                        <label className={`${styles.label} !mb-0 cursor-pointer`} htmlFor="freePreviewEnabled">
+                            Enable Free Preview with VideoCipher
+                        </label>
+                    </div>
+                </div>
+                <br />
+
                 {/* Thumbnail upload via file input or drag-and-drop */}
                 <div className="w-full">
                     <input

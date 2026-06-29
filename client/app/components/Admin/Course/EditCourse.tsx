@@ -26,10 +26,13 @@ const EditCourse: FC<Props> = ({ id }) => {
     tags: "",
     level: "",
     demoUrl: "",
+    videoCipherVideoId: "",
+    freePreviewEnabled: false,
     thumbnail: "",
   });
   const [benefits, setBenefits] = useState([{ title: "" }]);
   const [prerequisites, setPrerequisites] = useState([{ title: "" }]);
+  const [targetAudience, setTargetAudience] = useState([{ title: "" }]);
   const [courseContentData, setCourseContentData] = useState([
     {
       videoUrl: "",
@@ -83,10 +86,13 @@ const EditCourse: FC<Props> = ({ id }) => {
         level: EditCourseData.level,
         categories: EditCourseData.categories,
         demoUrl: EditCourseData.demoUrl,
+        videoCipherVideoId: EditCourseData.videoCipherVideoId || "",
+        freePreviewEnabled: EditCourseData.freePreviewEnabled || false,
         thumbnail: EditCourseData?.thumbnail?.url,
       });
       setBenefits(EditCourseData.benefits);
       setPrerequisites(EditCourseData.prerequisites);
+      setTargetAudience(EditCourseData.targetAudience?.length ? EditCourseData.targetAudience : [{ title: "" }]);
       setCourseContentData(EditCourseData.courseData);
     }
   }, [EditCourseData]);
@@ -107,6 +113,10 @@ const EditCourse: FC<Props> = ({ id }) => {
     //format prerequisites array
     const formattedPrerequisites = prerequisites.map((prerequisite) => ({
       title: prerequisite.title,
+    }));
+    //format target audience array
+    const formattedTargetAudience = targetAudience.map((audience) => ({
+      title: audience.title,
     }));
     //format course content Array
     const formattedCourseContentData = courseContentData.map((content) => ({
@@ -133,9 +143,12 @@ const EditCourse: FC<Props> = ({ id }) => {
       thumbnail: courseInfo.thumbnail,
       level: courseInfo.level,
       demoUrl: courseInfo.demoUrl,
+      videoCipherVideoId: courseInfo.videoCipherVideoId,
+      freePreviewEnabled: courseInfo.freePreviewEnabled,
       totalVideos: courseContentData.length,
       benefits: formattedBenefits,
       prerequisites: formattedPrerequisites,
+      targetAudience: formattedTargetAudience,
       courseData: formattedCourseContentData,
     };
     setCourseData(data);
@@ -158,6 +171,8 @@ const EditCourse: FC<Props> = ({ id }) => {
             setBenefits={setBenefits}
             prequisites={prerequisites}
             setPrerequisites={setPrerequisites}
+            targetAudience={targetAudience}
+            setTargetAudience={setTargetAudience}
             active={active}
             setActive={setActive}
           />

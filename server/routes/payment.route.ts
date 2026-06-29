@@ -3,8 +3,6 @@ import { isAuthenticated, authorizeRoles } from "../middleware/auth";
 import {
   sendStripePublishableKey,
   newPayment,
-  getUserOrders,
-  getUserDashboardStats,
   enrollFreeCourse,
   processRefund,
   getOrderReceipt,
@@ -39,23 +37,10 @@ paymentRouter.post(
   processRefund
 );
 
-// Get order receipt
 paymentRouter.get(
   "/payment/receipt/:orderId",
   isAuthenticated,
   getOrderReceipt
-);
-
-paymentRouter.get(
-  "/user-orders",
-  isAuthenticated,
-  getUserOrders
-);
-
-paymentRouter.get(
-  "/user-dashboard-stats",
-  isAuthenticated,
-  getUserDashboardStats
 );
 
 export { stripeWebhook };

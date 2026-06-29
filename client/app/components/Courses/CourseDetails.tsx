@@ -1,5 +1,6 @@
 import { styles } from "../../styles/styles";
 import CoursePlayer from "../../utils/CoursePlayer";
+import VideoCipherPlayer from "../Video/VideoCipherPlayer";
 import Ratings from "../../utils/Ratings";
 import Link from "next/link";
 import React, { FC, useEffect, useState } from "react";
@@ -7,6 +8,16 @@ import { IoCheckmarkDoneOutline, IoCloseOutline } from "react-icons/io5";
 import { format } from "timeago.js";
 import CourseContentList from "./CourseContentList";
 import { Elements } from "@stripe/react-stripe-js";
+import CheckOutForm from "../Payment/CheckOutForm";
+import { useLoadUserQuery } from "../../../redux/features/api/apiSlice";
+import Image from "next/image";
+import { VscVerifiedFilled } from "react-icons/vsc";
+import { useSelector, useDispatch } from "react-redux";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import { userLoggedIn } from "../../../redux/features/auth/authSlice";
+import io from "socket.io-client"; // FIX #3: static import instead of require()
+
 type Props = {
   data: any;
   clientSecret: string;
@@ -24,14 +35,6 @@ type Props = {
   freeEnrollError: any;
   freeEnrollLoading: boolean;
 };
-import CheckOutForm from "../Payment/CheckOutForm";
-import { useLoadUserQuery } from "../../../redux/features/api/apiSlice";
-import Image from "next/image";
-import { VscVerifiedFilled } from "react-icons/vsc";
-import { useSelector, useDispatch } from "react-redux";
-import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
-import { userLoggedIn } from "../../../redux/features/auth/authSlice";
 
 const CourseDetails: FC<Props> = ({
   data,
@@ -67,8 +70,15 @@ const CourseDetails: FC<Props> = ({
   const user = reduxUser || userData?.user;
   const isLoggedIn = !!user && typeof user === "object" && !!user._id;
   //persentage logic
-  const discountPercentage =
-    ((data?.estimatedPrice - data?.price) / data?.estimatedPrice) * 100;
+  // FIX #1: guard against estimatedPrice being 0/undefined so we don't render "NaN% OFF"
+  const hasValidEstimatedPrice =
+    typeof data?.estimatedPrice === "number" &&
+    data.estimatedPrice > 0 &&
+    typeof data?.price === "number" &&
+    data.estimatedPrice > data.price;
+  const discountPercentage = hasValidEstimatedPrice
+    ? ((data.estimatedPrice - data.price) / data.estimatedPrice) * 100
+    : 0;
   //getting only 2-digits after decimal
   const discountPercentagePrice = discountPercentage.toFixed(0);
   //checking weather the user has purchased this course or not
@@ -86,15 +96,26 @@ const CourseDetails: FC<Props> = ({
   useEffect(() => {
     if (freeEnrollData?.success) {
       toast.success("Successfully enrolled in the course!");
-      // Emit notification
-      const socket = require("socket.io-client")(process.env.NEXT_PUBLIC_SOCKET_URI || "", { transports: ["websocket"] });
-      socket.emit("notification", {
-        title: "New Enrollment",
-        message: `A user has enrolled in ${data?.name || "a free course"}`,
-        userId: user?._id,
-      });
-      setTimeout(() => socket.disconnect(), 1000);
-      
+
+      // FIX #3: use the statically-imported `io`, guard against a missing/blank
+      // socket URI, and don't disconnect on a blind timeout — disconnect once
+      // the emit has actually been acknowledged (or the connection fails).
+      const socketUri = process.env.NEXT_PUBLIC_SOCKET_URI;
+      if (socketUri) {
+        const socket = io(socketUri, { transports: ["websocket"] });
+        socket.on("connect", () => {
+          socket.emit("notification", {
+            title: "New Enrollment",
+            message: `A user has enrolled in ${data?.name || "a free course"}`,
+            userId: user?._id,
+          });
+          socket.disconnect();
+        });
+        socket.on("connect_error", () => {
+          socket.disconnect();
+        });
+      }
+
       // Update Redux state
       if (user && data?._id) {
         const existingCourses = Array.isArray(user.courses) ? user.courses : [];
@@ -114,7 +135,8 @@ const CourseDetails: FC<Props> = ({
       const errMsg = (freeEnrollError as any)?.data?.message || "Failed to enroll";
       toast.error(errMsg);
     }
-  }, [freeEnrollData, freeEnrollError]);
+    // FIX #4: include everything the effect actually reads
+  }, [freeEnrollData, freeEnrollError, data, user, token, dispatch, router]);
 
   // Handle coupon error
   useEffect(() => {
@@ -161,10 +183,13 @@ const CourseDetails: FC<Props> = ({
         <div className="w-full flex flex-col-reverse 800px:flex-row">
           {/*  LEFT SIDE */}
           <div className="w-full 800px:w-[65%] 800px:pr-5">
-            <h1 className="text-[25px] font-Poppins font-[600] text-black dark:text-white">
+            <h1 className="text-3xl font-bold font-Poppins text-black dark:text-white mb-2">
               {data.name}
             </h1>
-            <div className="flex items-center justify-between pt-3">
+            <p className="text-lg text-gray-600 dark:text-gray-400 mb-4">
+              {data.description?.slice(0, 150)}...
+            </p>
+            <div className="flex items-center justify-between pt-3 pb-6 border-b border-gray-200 dark:border-gray-800">
               <div className="flex items-center">
                 <Ratings rating={data.ratings} />
                 <h5 className="text-black dark:text-white">
@@ -177,8 +202,8 @@ const CourseDetails: FC<Props> = ({
             </div>
             <br />
             {/* Each benefits  */}
-            <h1 className="text-[25px] font-Poppins font-[600] text-black dark:text-white">
-              What you will learn from this course?
+            <h1 className="text-2xl font-bold font-Poppins text-black dark:text-white mb-4">
+              What you will learn from this course
             </h1>
             <div>
               {data.benefits?.map((item: any, index: number) => (
@@ -203,8 +228,8 @@ const CourseDetails: FC<Props> = ({
             <br />
             <br />
             {/* Each prerequisite */}
-            <h1 className="text-[25px] font-Poppins font-[600] text-black dark:text-white">
-              What are the prerequisites for starting this course?
+            <h1 className="text-2xl font-bold font-Poppins text-black dark:text-white mb-4">
+              Requirements
             </h1>
             {data.prerequisites?.map((item: any, index: number) => (
               <div className="w-full flex 800px:items-center py-2" key={index}>
@@ -214,11 +239,31 @@ const CourseDetails: FC<Props> = ({
                     className="text-black dark:text-white"
                   />
                 </div>
-                <p className="pl-2 text-black dark:text-white">{item.title}</p>
+                <p className="pl-2 text-black dark:text-white">{item.title || item}</p>
               </div>
             ))}
             <br />
             <br />
+
+            {/* Target Audience */}
+            {data.targetAudience && data.targetAudience.length > 0 && (
+              <>
+                <h1 className="text-2xl font-bold font-Poppins text-black dark:text-white mb-4">
+                  Target Audience
+                </h1>
+                {data.targetAudience.map((item: any, index: number) => (
+                  <div className="w-full flex 800px:items-center py-2" key={index}>
+                    <div className="w-[15px] mr-1">
+                      <IoCheckmarkDoneOutline size={20} className="text-black dark:text-white" />
+                    </div>
+                    <p className="pl-2 text-black dark:text-white">{item.title || item}</p>
+                  </div>
+                ))}
+                <br />
+                <br />
+              </>
+            )}
+
             <div>
               <h1 className="text-[25px] font-Poppins font-[600] text-black dark:text-white">
                 Course Overview
@@ -231,8 +276,8 @@ const CourseDetails: FC<Props> = ({
             {/* Course Discryption */}
 
             <div className="w-full">
-              <h1 className="text-[25px] font-Poppins font-[600] text-black dark:text-white">
-                Course Details
+              <h1 className="text-2xl font-bold font-Poppins text-black dark:text-white mb-4">
+                Course Description
               </h1>
               <p className="text-[18px] mt-[20px] whitespace-pre-line w-full overflow-hidden text-black dark:text-white">
                 {data.description}
@@ -240,6 +285,36 @@ const CourseDetails: FC<Props> = ({
             </div>
             <br />
             <br />
+
+            {/* Instructor Section */}
+            {data.instructor && (
+              <div className="w-full mb-8">
+                <h1 className="text-2xl font-bold font-Poppins text-black dark:text-white mb-4">
+                  About the Instructor
+                </h1>
+                <div className="flex items-start gap-4 p-5 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm">
+                  <div className="w-[80px] h-[80px] rounded-full overflow-hidden flex-shrink-0">
+                    <img
+                      src={data.instructor.photo || "https://res.cloudinary.com/dshp9jnuy/image/upload/v1665822253/avatars/nrxsg8sd9iy10bbsoenn.png"}
+                      alt={data.instructor.name || "Instructor"}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                      {data.instructor.name || "Course Instructor"}
+                    </h2>
+                    <p className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-2">
+                      {data.instructor.designation || "Senior Software Engineer"}
+                    </p>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">
+                      {data.instructor.bio || "Passionate about building scalable web applications and teaching development best practices to students worldwide."}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* REVIEWS */}
             <div className="w-full">
               <div className="800px:flex items-center ">
@@ -273,8 +348,9 @@ const CourseDetails: FC<Props> = ({
                       </div>
                       <div className="hidden 800px:block pl-2">
                         <div className="flex items-center">
+                          {/* FIX #6: optional chaining + fallback for a possibly-missing user */}
                           <h5 className="text-[18px] pr-2 text-black dark:text-white">
-                            {item.user.name}
+                            {item.user?.name || "Anonymous"}
                           </h5>
                           <Ratings rating={item.rating} />
                         </div>
@@ -289,12 +365,13 @@ const CourseDetails: FC<Props> = ({
                     {/* Replies */}
 
                     {/* Comment Replies */}
-                    {item.commentReplies.map((i: any, index: number) => (
+                    {/* FIX #2 & #7: guard the array itself and each reply's user object */}
+                    {(item.commentReplies ?? []).map((i: any, index: number) => (
                       <div className="w-full flex 800px:ml-16 my-5" key={index}>
                         <div className="w-[50px] h-[50px]">
                           <Image
                             src={
-                              i.user.avatar
+                              i.user?.avatar
                                 ? i.user.avatar.url
                                 : "https://res.cloudinary.com/dshp9jnuy/image/upload/v1665822253/avatars/nrxsg8sd9iy10bbsoenn.png"
                             }
@@ -306,7 +383,7 @@ const CourseDetails: FC<Props> = ({
                         </div>
                         <div className="pl-2">
                           <div className="flex items-center">
-                            <h5 className="text-[20px]">{i.user.name}</h5>
+                            <h5 className="text-[20px]">{i.user?.name || "Anonymous"}</h5>
                             <VscVerifiedFilled className="text-[#0095F6] ml-2 text-[20px]" />
                           </div>
                           <p>{i.comment}</p>
@@ -324,8 +401,12 @@ const CourseDetails: FC<Props> = ({
           <div className="w-full 800px:w-[35%] relative">
             {/* Fixed position on scroll  stays in view */}
             <div className="sticky top-[100px] left-0 z-50 w-full">
-              <CoursePlayer videoUrl={data.demoUrl} title={data.title} />
-              
+              {data.freePreviewEnabled ? (
+                <VideoCipherPlayer courseId={data._id} />
+              ) : (
+                <CoursePlayer videoUrl={data.demoUrl} title={data.name} />
+              )}
+
               {/* Price Section */}
               <div className="mt-4 p-5 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-lg">
                 <div className="flex items-baseline gap-3 mb-1">
@@ -337,12 +418,12 @@ const CourseDetails: FC<Props> = ({
                       ${data.price}
                     </h5>
                   )}
-                  {!appliedCoupon && data.estimatedPrice > data.price && (
+                  {!appliedCoupon && hasValidEstimatedPrice && (
                     <h5 className="text-lg line-through text-gray-400 dark:text-gray-500">
                       ${data.estimatedPrice}
                     </h5>
                   )}
-                  {data.estimatedPrice > data.price && !appliedCoupon && (
+                  {hasValidEstimatedPrice && !appliedCoupon && (
                     <span className="px-2.5 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg text-xs font-bold">
                       {discountPercentagePrice}% OFF
                     </span>
@@ -505,7 +586,7 @@ const CourseDetails: FC<Props> = ({
                     {appliedCoupon && (
                       <p className="text-xs text-gray-400 line-through">${data.price}</p>
                     )}
-                    {!appliedCoupon && data.estimatedPrice > data.price && (
+                    {!appliedCoupon && hasValidEstimatedPrice && (
                       <p className="text-xs text-gray-400 line-through">${data.estimatedPrice}</p>
                     )}
                   </div>

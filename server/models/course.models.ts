@@ -24,6 +24,7 @@ interface ICourseData {
   title: string;
   description: string;
   videoUrl: string;
+  videoCipherVideoId?: string;
   category: string;
   price: number;
   publishedBy: string;
@@ -36,6 +37,7 @@ interface ICourseData {
 
 export interface ICourse extends Document {
   name: string;
+  slug?: string;
   description: string;
   price: number;
   estimatedTime?: number;
@@ -46,9 +48,12 @@ export interface ICourse extends Document {
   tags: string;
   level: "Beginner" | "Intermediate" | "Advanced";
   demoUrl?: string;
+  videoCipherVideoId?: string;
+  freePreviewEnabled?: boolean;
   benefits: string[];
   courseData: ICourseData[];
   prerequisites?: string[];
+  targetAudience?: string[];
   reviews: IReview[];
   ratings: number;
   purchased: number;
@@ -90,6 +95,7 @@ const courseDataSchema = new Schema<ICourseData>(
     title: { type: String, required: true },
     description: { type: String, required: true },
     videoUrl: { type: String, required: true },
+    videoCipherVideoId: { type: String },
     category: { type: String, required: true },
     price: { type: Number, required: true },
     publishedBy: { type: String, required: true },
@@ -105,6 +111,7 @@ const courseDataSchema = new Schema<ICourseData>(
 const courseSchema = new Schema<ICourse>(
   {
     name: { type: String, required: true },
+    slug: { type: String },
     description: { type: String, required: true },
     price: { type: Number, required: true },
     estimatedTime: { type: Number },
@@ -124,11 +131,17 @@ const courseSchema = new Schema<ICourse>(
 
     demoUrl: { type: String },
 
+    videoCipherVideoId: { type: String },
+
+    freePreviewEnabled: { type: Boolean, default: false },
+
     benefits: [{ type: String, required: true }],
 
     courseData: [{ type: courseDataSchema, required: true }],
 
     prerequisites: [{ type: String }],
+
+    targetAudience: [{ type: String }],
 
     reviews: [reviewSchema],
 

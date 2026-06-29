@@ -55,14 +55,6 @@ export const orderApi = apiSlice.injectEndpoints({
       }),
     }),
 
-    // Get order receipt
-    getOrderReceipt: builder.query({
-      query: (orderId) => ({
-        url: `/api/v1/payment/receipt/${orderId}`,
-        method: "GET",
-        credentials: "include" as const,
-      }),
-    }),
   }),
 });
 
@@ -73,5 +65,4 @@ export const {
   useGetStripePublishAbleKeyQuery,
   useEnrollFreeCourseMutation,
   useApplyCouponMutation,
-  useGetOrderReceiptQuery,
 } = orderApi;
