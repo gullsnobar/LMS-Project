@@ -136,10 +136,17 @@ const CoursesContent = () => {
         ? categories.layout.categories 
         : demoCategories;
 
-    // Use API courses or fallback to demo courses
-    const allCourses = (data?.courses ?? data?.course ?? []).length > 0 
-        ? (data?.courses ?? data?.course ?? []) 
-        : demoCourses;
+    // Use API courses only — never fall back to demo data with fake IDs
+    // because demo IDs (demo1, demo2...) don't exist in MongoDB → "Course not found"
+    const apiCourses: any[] = data?.courses ?? data?.course ?? [];
+    const isApiAvailable = apiCourses.length > 0;
+
+    // isDemo is only true AFTER loading finishes AND the API returned nothing
+    // This prevents a flash of demo content while the real data is still loading
+    const isDemo = !isLoading && !isApiAvailable;
+
+    // Show demo courses ONLY as visual placeholders (non-clickable) when API is unavailable
+    const allCourses = isApiAvailable ? apiCourses : demoCourses;
 
     const courses = (allCourses as any[]).filter((item: any) => {
         const matchesSearch = searchTerm ? item.name.toLowerCase().includes(searchTerm.toLowerCase()) : true;
@@ -234,6 +241,21 @@ const CoursesContent = () => {
                         </div>
                     )}
 
+                    {/* Server Offline Banner — shown only when using demo fallback data */}
+                    {!isLoading && isDemo && (
+                        <div className="mb-8 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl flex items-start gap-3">
+                            <svg className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.539-1.333-3.309 0L3.732 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            <div>
+                                <p className="font-semibold text-amber-800 dark:text-amber-300 text-sm">Server not connected</p>
+                                <p className="text-amber-700 dark:text-amber-400 text-xs mt-0.5">
+                                    Showing preview cards only. Make sure your backend server is running at <code className="bg-amber-100 dark:bg-amber-900/40 px-1 rounded">localhost:5000</code> and try refreshing.
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Course Grid */}
                     <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 1500px:grid-cols-4 mb-12">
                         {!isLoading && courses &&
@@ -243,7 +265,7 @@ const CoursesContent = () => {
                                     className="animate-fadeInUp"
                                     style={{ animationDelay: `${index * 0.1}s` }}
                                 >
-                                    <CourseCard item={item} key={index} />
+                                    <CourseCard item={item} key={index} isDemo={isDemo} />
                                 </div>
                             ))}
                     </div>

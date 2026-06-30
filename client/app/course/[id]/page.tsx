@@ -12,7 +12,7 @@ const Page = ({ params }: Props) => {
   const { id } = use(params); 
 
   return (
-    <div>
+    <div className="min-h-screen w-full overflow-x-hidden">
       <CourseDetailsPage id={id} />
     </div>
   );

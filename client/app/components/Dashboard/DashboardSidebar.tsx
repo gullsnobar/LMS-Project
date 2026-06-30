@@ -4,14 +4,8 @@ import React, { FC, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  HiOutlineHome,
-  HiOutlineAcademicCap,
-  HiOutlineCreditCard,
-  HiOutlineCog6Tooth,
-  HiOutlineTrophy,
   HiOutlineChevronLeft,
   HiOutlineChevronRight,
-  HiOutlineArrowRightOnRectangle,
   HiOutlineBars3,
   HiOutlineXMark,
   HiOutlineSparkles,
@@ -31,36 +25,11 @@ type Props = {
 };
 
 const menuItems = [
-  {
-    key: "overview",
-    label: "Overview",
-    icon: HiOutlineHome,
-    badge: null,
-  },
-  {
-    key: "courses",
-    label: "My Courses",
-    icon: HiOutlineAcademicCap,
-    badge: null,
-  },
-  {
-    key: "orders",
-    label: "Order History",
-    icon: HiOutlineCreditCard,
-    badge: null,
-  },
-  {
-    key: "certificates",
-    label: "Certificates",
-    icon: HiOutlineTrophy,
-    badge: null,
-  },
-  {
-    key: "settings",
-    label: "Settings",
-    icon: HiOutlineCog6Tooth,
-    badge: null,
-  },
+  { key: "overview",      label: "Overview" },
+  { key: "courses",       label: "My Courses" },
+  { key: "orders",        label: "Order History" },
+  { key: "certificates", label: "Certificates" },
+  { key: "settings",      label: "Settings" },
 ];
 
 const DashboardSidebar: FC<Props> = ({
@@ -158,7 +127,6 @@ const DashboardSidebar: FC<Props> = ({
           </p>
         )}
         {menuItems.map((item) => {
-          const Icon = item.icon;
           const isActive = activeTab === item.key;
           return (
             <button
@@ -168,7 +136,7 @@ const DashboardSidebar: FC<Props> = ({
                 setMobileOpen(false);
               }}
               className={`w-full flex items-center ${
-                collapsed ? "justify-center px-2" : "px-3"
+                collapsed ? "justify-center px-2" : "px-4"
               } py-2.5 rounded-xl text-[13px] font-medium transition-all duration-200 group relative ${
                 isActive
                   ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-600/20 dark:shadow-blue-600/30"
@@ -176,18 +144,15 @@ const DashboardSidebar: FC<Props> = ({
               }`}
               title={collapsed ? item.label : undefined}
             >
-              <Icon
-                size={19}
-                className={isActive ? "text-white" : "opacity-70 group-hover:opacity-100"}
-              />
-              {!collapsed && <span className="ml-3">{item.label}</span>}
-
-              {/* badge */}
-              {item.badge && !collapsed && (
-                <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded-full bg-red-500/90 text-white font-bold">
-                  {item.badge}
-                </span>
+              {/* Active indicator dot when collapsed */}
+              {collapsed && isActive && (
+                <span className="w-2 h-2 rounded-full bg-white" />
               )}
+              {collapsed && !isActive && (
+                <span className="w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-600" />
+              )}
+
+              {!collapsed && <span>{item.label}</span>}
 
               {/* collapsed tooltip */}
               {collapsed && (
@@ -241,12 +206,15 @@ const DashboardSidebar: FC<Props> = ({
         <button
           onClick={handleLogout}
           className={`w-full flex items-center ${
-            collapsed ? "justify-center px-2" : "px-3"
+            collapsed ? "justify-center px-2" : "px-4"
           } py-2.5 rounded-xl text-[13px] font-medium text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/15 transition-all duration-200`}
           title={collapsed ? "Logout" : undefined}
         >
-          <HiOutlineArrowRightOnRectangle size={19} />
-          {!collapsed && <span className="ml-3">Logout</span>}
+          {collapsed ? (
+            <span className="w-2 h-2 rounded-full bg-red-400" />
+          ) : (
+            <span>Logout</span>
+          )}
         </button>
       </div>
     </>

@@ -10,9 +10,7 @@ import {
   HiOutlineTrophy,
   HiOutlineArrowTrendingUp,
   HiOutlineChevronRight,
-  HiOutlineClipboardDocumentList,
   HiOutlineBookOpen,
-  HiOutlineQuestionMarkCircle,
   HiOutlineRocketLaunch,
   HiOutlineCalendarDays,
   HiOutlineFire,
@@ -93,18 +91,16 @@ const ActivityItem: FC<{
 /* ─── Quick Action ─────────────────────────────────────────── */
 const QuickAction: FC<{
   href: string;
-  icon: React.ReactNode;
   title: string;
   desc: string;
   gradient: string;
   onClick?: () => void;
-}> = ({ href, icon, title, desc, gradient, onClick }) =>
+}> = ({ href, title, desc, gradient, onClick }) =>
   onClick ? (
     <button
       onClick={onClick}
       className={`text-left group p-5 ${gradient} rounded-2xl border border-transparent hover:shadow-xl transition-all duration-300 hover:-translate-y-1`}
     >
-      <div className="mb-3">{icon}</div>
       <h3 className="font-bold text-gray-900 dark:text-white text-sm mb-1">
         {title}
       </h3>
@@ -117,7 +113,6 @@ const QuickAction: FC<{
       href={href}
       className={`group p-5 ${gradient} rounded-2xl border border-transparent hover:shadow-xl transition-all duration-300 hover:-translate-y-1`}
     >
-      <div className="mb-3">{icon}</div>
       <h3 className="font-bold text-gray-900 dark:text-white text-sm mb-1">
         {title}
       </h3>
@@ -499,12 +494,6 @@ const DashboardOverview: FC<Props> = ({ user, setActiveTab }) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <QuickAction
             href="/courses"
-            icon={
-              <HiOutlineRocketLaunch
-                size={24}
-                className="text-blue-600 dark:text-blue-400"
-              />
-            }
             title="Discover Courses"
             desc="Browse our expert-led course library"
             gradient="bg-blue-50/80 dark:bg-blue-900/10 hover:bg-blue-100/80 dark:hover:bg-blue-900/20"
@@ -512,12 +501,6 @@ const DashboardOverview: FC<Props> = ({ user, setActiveTab }) => {
           <QuickAction
             href="#"
             onClick={() => setActiveTab("orders")}
-            icon={
-              <HiOutlineClipboardDocumentList
-                size={24}
-                className="text-purple-600 dark:text-purple-400"
-              />
-            }
             title="Order History"
             desc="View your purchase transactions"
             gradient="bg-purple-50/80 dark:bg-purple-900/10 hover:bg-purple-100/80 dark:hover:bg-purple-900/20"
@@ -525,24 +508,12 @@ const DashboardOverview: FC<Props> = ({ user, setActiveTab }) => {
           <QuickAction
             href="#"
             onClick={() => setActiveTab("certificates")}
-            icon={
-              <HiOutlineTrophy
-                size={24}
-                className="text-amber-600 dark:text-amber-400"
-              />
-            }
             title="Certificates"
             desc="Download your achievements"
             gradient="bg-amber-50/80 dark:bg-amber-900/10 hover:bg-amber-100/80 dark:hover:bg-amber-900/20"
           />
           <QuickAction
             href="/faq"
-            icon={
-              <HiOutlineQuestionMarkCircle
-                size={24}
-                className="text-emerald-600 dark:text-emerald-400"
-              />
-            }
             title="Help Center"
             desc="Get answers to your questions"
             gradient="bg-emerald-50/80 dark:bg-emerald-900/10 hover:bg-emerald-100/80 dark:hover:bg-emerald-900/20"

@@ -10,17 +10,18 @@ type Props = {
 };
 
 const CourseContentList: FC<Props> = (props: Props) => {
-  const [visibleSection, SetVisibleSection] = useState<Set<string>>(
-    new Set<string>()
-  );
-
   // Find unique video sections by -->name
   const videoSection: string[] = [
     ...new Set<string>(props.data?.map((item: any) => item.videoSection)),
   ];
 
+  // Open the first section by default so content is visible immediately (matches template)
+  const [visibleSection, SetVisibleSection] = useState<Set<string>>(
+    new Set<string>(videoSection.length > 0 ? [videoSection[0]] : [])
+  );
+
   let totalCount: number = 0;
-  //this behaves like a accordian
+  //this behaves like an accordion
   const toggleSection = (section: string) => {
     const newVisibleSection = new Set(visibleSection);
     if (newVisibleSection.has(section)) {

@@ -179,16 +179,13 @@ const CourseDetails: FC<Props> = ({
 
   return (
     <>
-      <div className="w-[90%] 800px:w-[90%] m-auto py-5">
+      <div className="w-[90%] 800px:w-[90%] m-auto py-5 pt-[100px]">
         <div className="w-full flex flex-col-reverse 800px:flex-row">
           {/*  LEFT SIDE */}
           <div className="w-full 800px:w-[65%] 800px:pr-5">
             <h1 className="text-3xl font-bold font-Poppins text-black dark:text-white mb-2">
               {data.name}
             </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-400 mb-4">
-              {data.description?.slice(0, 150)}...
-            </p>
             <div className="flex items-center justify-between pt-3 pb-6 border-b border-gray-200 dark:border-gray-800">
               <div className="flex items-center">
                 <Ratings rating={data.ratings} />
@@ -203,7 +200,7 @@ const CourseDetails: FC<Props> = ({
             <br />
             {/* Each benefits  */}
             <h1 className="text-2xl font-bold font-Poppins text-black dark:text-white mb-4">
-              What you will learn from this course
+              What you will learn from this course?
             </h1>
             <div>
               {data.benefits?.map((item: any, index: number) => (
@@ -229,7 +226,7 @@ const CourseDetails: FC<Props> = ({
             <br />
             {/* Each prerequisite */}
             <h1 className="text-2xl font-bold font-Poppins text-black dark:text-white mb-4">
-              Requirements
+              What are the prerequisites for starting this course?
             </h1>
             {data.prerequisites?.map((item: any, index: number) => (
               <div className="w-full flex 800px:items-center py-2" key={index}>
@@ -346,7 +343,7 @@ const CourseDetails: FC<Props> = ({
                           className="w-[50px] h-[50px] rounded-full object-cover"
                         />
                       </div>
-                      <div className="hidden 800px:block pl-2">
+                      <div className="block pl-2">
                         <div className="flex items-center">
                           {/* FIX #6: optional chaining + fallback for a possibly-missing user */}
                           <h5 className="text-[18px] pr-2 text-black dark:text-white">
@@ -400,7 +397,7 @@ const CourseDetails: FC<Props> = ({
           {/* Right Side */}
           <div className="w-full 800px:w-[35%] relative">
             {/* Fixed position on scroll  stays in view */}
-            <div className="sticky top-[100px] left-0 z-50 w-full">
+            <div className="sticky top-[90px] left-0 z-50 w-full">
               {data.freePreviewEnabled ? (
                 <VideoCipherPlayer courseId={data._id} />
               ) : (
