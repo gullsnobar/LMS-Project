@@ -107,10 +107,8 @@ const CourseCard: FC<Props> = ({ item, isProfile, isDemo }) => {
             </div>
           </div>
         ) : (
-          <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <div className="w-full py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-center rounded-lg font-semibold text-sm shadow-lg">
-              View Demo Preview →
-            </div>
+          <div className="w-full py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-center rounded-lg font-semibold text-sm shadow-lg">
+            Click to Preview Course Page →
           </div>
         )}
       </div>

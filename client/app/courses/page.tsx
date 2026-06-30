@@ -125,7 +125,7 @@ const demoCategories = [
 const CoursesContent = () => {
     const searchParams = useSearchParams();
     const searchTerm = searchParams?.get("title");
-    const { data, isLoading } = useGetUsersAllCoursesQuery({});
+    const { data, isLoading, isError } = useGetUsersAllCoursesQuery({});
     const { data: categories } = useGetHeroDataQuery("Categories", {});
     const [route, setRoute] = useState("Login");
     const [open, setOpen] = useState(false);
@@ -136,16 +136,15 @@ const CoursesContent = () => {
         ? categories.layout.categories 
         : demoCategories;
 
-    // Use API courses only — never fall back to demo data with fake IDs
-    // because demo IDs (demo1, demo2...) don't exist in MongoDB → "Course not found"
     const apiCourses: any[] = data?.courses ?? data?.course ?? [];
     const isApiAvailable = apiCourses.length > 0;
 
-    // isDemo is only true AFTER loading finishes AND the API returned nothing
-    // This prevents a flash of demo content while the real data is still loading
-    const isDemo = !isLoading && !isApiAvailable;
+    // Distinguish: server truly offline (isError) vs server online but DB empty (!isApiAvailable)
+    const isServerOffline = !isLoading && isError;
+    const isDbEmpty = !isLoading && !isError && !isApiAvailable;
+    const isDemo = !isLoading && !isApiAvailable; // show demo cards in both cases
 
-    // Show demo courses ONLY as visual placeholders (non-clickable) when API is unavailable
+    // Show real courses if available, else demo previews
     const allCourses = isApiAvailable ? apiCourses : demoCourses;
 
     const courses = (allCourses as any[]).filter((item: any) => {
@@ -241,16 +240,31 @@ const CoursesContent = () => {
                         </div>
                     )}
 
-                    {/* Server Offline Banner — shown only when using demo fallback data */}
-                    {!isLoading && isDemo && (
-                        <div className="mb-8 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl flex items-start gap-3">
-                            <svg className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.539-1.333-3.309 0L3.732 16c-.77 1.333.192 3 1.732 3z" />
+                    {/* Banner 1: Server truly unreachable (network error / CORS) */}
+                    {isServerOffline && (
+                        <div className="mb-8 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-xl flex items-start gap-3">
+                            <svg className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636a9 9 0 010 12.728M15.536 8.464a5 5 0 010 7.072M12 12h.01M6.343 17.657a9 9 0 010-12.728" />
                             </svg>
                             <div>
-                                <p className="font-semibold text-amber-800 dark:text-amber-300 text-sm">Server not connected</p>
-                                <p className="text-amber-700 dark:text-amber-400 text-xs mt-0.5">
-                                    Showing preview cards only. Make sure your backend server is running at <code className="bg-amber-100 dark:bg-amber-900/40 px-1 rounded">localhost:5000</code> and try refreshing.
+                                <p className="font-semibold text-red-800 dark:text-red-300 text-sm">Cannot reach backend server</p>
+                                <p className="text-red-700 dark:text-red-400 text-xs mt-0.5">
+                                    Make sure your backend is running: <code className="bg-red-100 dark:bg-red-900/40 px-1 rounded">cd server &amp;&amp; npm run dev</code>. Showing demo previews below — <strong>click any card</strong> to preview the course page layout.
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Banner 2: Server connected but no courses in DB yet */}
+                    {isDbEmpty && (
+                        <div className="mb-8 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-xl flex items-start gap-3">
+                            <svg className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <div>
+                                <p className="font-semibold text-blue-800 dark:text-blue-300 text-sm">No courses in database yet</p>
+                                <p className="text-blue-700 dark:text-blue-400 text-xs mt-0.5">
+                                    Your server is connected ✓ but no courses have been added. Go to <strong>Admin Panel → Create Course</strong> to add real courses. Meanwhile, <strong>click any preview card below</strong> to see the full course page layout.
                                 </p>
                             </div>
                         </div>
@@ -269,6 +283,7 @@ const CoursesContent = () => {
                                 </div>
                             ))}
                     </div>
+
                 </div>
                 <Footer />
             </>

@@ -398,10 +398,32 @@ const CourseDetails: FC<Props> = ({
           <div className="w-full 800px:w-[35%] relative">
             {/* Fixed position on scroll  stays in view */}
             <div className="sticky top-[90px] left-0 z-50 w-full">
-              {data.freePreviewEnabled ? (
-                <VideoCipherPlayer courseId={data._id} />
+              {/* Demo courses: show thumbnail — don't call VdoCipher API (fake ID = 500 error) */}
+              {data._id?.startsWith("demo") ? (
+                <div className="relative w-full rounded-xl overflow-hidden" style={{ paddingTop: "56.25%" }}>
+                  <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
+                    {data.thumbnail?.url ? (
+                      <img
+                        src={data.thumbnail.url}
+                        alt={data.name}
+                        className="absolute inset-0 w-full h-full object-cover opacity-40"
+                      />
+                    ) : null}
+                    <div className="relative text-center px-4 z-10">
+                      <div className="w-16 h-16 bg-white/15 rounded-full flex items-center justify-center mx-auto mb-3 backdrop-blur-sm">
+                        <svg className="w-8 h-8 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                            d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <p className="text-white font-semibold text-sm">Demo Preview</p>
+                      <p className="text-white/50 text-xs mt-1">Add a real course to see video</p>
+                    </div>
+                  </div>
+                </div>
               ) : (
-                <CoursePlayer videoUrl={data.demoUrl} title={data.name} />
+                <VideoCipherPlayer courseId={data._id} />
               )}
 
               {/* Price Section */}
@@ -525,15 +547,17 @@ const CourseDetails: FC<Props> = ({
                 <div className="mt-5 pt-4 border-t border-gray-200 dark:border-gray-800 space-y-2.5">
                   <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">This course includes:</h4>
                   {[
-                    { icon: "📦", text: "Source code included" },
-                    { icon: "♾️", text: "Full lifetime access" },
-                    { icon: "📜", text: "Certificate of completion" },
-                    { icon: "🎧", text: "Premium Support" },
-                    { icon: "📱", text: "Access on mobile & desktop" },
+                    "Source code included",
+                    "Full lifetime access",
+                    "Certificate of completion",
+                    "Premium Support",
+                    "Access on mobile & desktop",
                   ].map((feature, idx) => (
                     <div key={idx} className="flex items-center gap-2.5">
-                      <span className="text-sm">{feature.icon}</span>
-                      <span className="text-sm text-gray-600 dark:text-gray-400">{feature.text}</span>
+                      <svg className="w-4 h-4 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">{feature}</span>
                     </div>
                   ))}
                 </div>
